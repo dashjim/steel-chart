@@ -7,10 +7,10 @@ function ensureNames() {
   const steels = getAllSteels()
   allNames = []
   for (const steel of steels) {
-    allNames.push({ name: steel.name, nameLower: steel.name.toLowerCase(), steel, isPrimary: true })
+    allNames.push({ name: steel.name, nameLower: steel.name.toLowerCase(), id: steel.id, isPrimary: true })
     if (steel.aliases) {
       for (const alias of steel.aliases) {
-        allNames.push({ name: alias, nameLower: alias.toLowerCase(), steel, isPrimary: false })
+        allNames.push({ name: alias, nameLower: alias.toLowerCase(), id: steel.id, isPrimary: false })
       }
     }
   }
@@ -51,16 +51,16 @@ export function search(keyword) {
   }
 
   const results = [...nameMap.values()].map(entry => ({
-    name: entry.name,
-    steel: entry.steel,
+    displayName: entry.name,
+    id: entry.id,
     dist: editDistance(kw, entry.nameLower)
   }))
 
   results.sort((a, b) => a.dist - b.dist)
 
   return results.map(r => ({
-    id: r.steel.id,
-    name: r.steel.name,
-    displayName: r.name
+    id: r.id,
+    name: r.displayName,
+    displayName: r.displayName
   }))
 }

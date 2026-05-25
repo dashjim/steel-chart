@@ -21,7 +21,9 @@ export function getAllSteels() {
 
 export function getSteelById(id) {
   ensureLoaded()
-  return steelsMapCache[parseInt(id)] || null
+  const steel = steelsMapCache[parseInt(id)]
+  if (!steel) return null
+  return JSON.parse(JSON.stringify(steel))
 }
 
 export function getDescription(id) {
