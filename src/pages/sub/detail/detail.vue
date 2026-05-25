@@ -12,7 +12,7 @@
           :key="el"
           @click="goElementInfo(el)"
         >
-          <text class="comp-el">{{ el }}</text>
+          <text class="comp-el">{{ el }}({{ elNames[el] || el }})</text>
           <text class="comp-val">{{ formatComp(vals) }}</text>
         </view>
       </view>
@@ -53,12 +53,19 @@
 import { getSteelById, getDescription } from '@/utils/data.js'
 import { search } from '@/utils/search.js'
 
+const EL_NAMES = {
+  C: '碳', Cr: '铬', Mo: '钼', V: '钒', W: '钨',
+  Co: '钴', Ni: '镍', Mn: '锰', Si: '硅',
+  S: '硫', P: '磷', Cu: '铜', Nb: '铌', N: '氮'
+}
+
 export default {
   data() {
     return {
       id: null,
       steel: null,
-      description: ''
+      description: '',
+      elNames: EL_NAMES
     }
   },
   onLoad(options) {
