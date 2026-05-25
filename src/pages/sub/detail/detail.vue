@@ -51,6 +51,7 @@
 
 <script>
 import { getSteelById, getDescription } from '@/utils/data.js'
+import { search } from '@/utils/search.js'
 
 export default {
   data() {
@@ -74,9 +75,8 @@ export default {
       uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
     },
     onAliasClick(alias) {
-      const { search } = require('@/utils/search.js')
       const results = search(alias)
-      const target = results.find(r => r.matchName === alias && r.id !== parseInt(this.id))
+      const target = results.find(r => r.displayName === alias && r.id !== parseInt(this.id))
       if (target) {
         uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + target.id })
       } else {

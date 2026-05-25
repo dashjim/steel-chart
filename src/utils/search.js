@@ -7,10 +7,10 @@ function ensureNames() {
   const steels = getAllSteels()
   allNames = []
   for (const steel of steels) {
-    allNames.push({ name: steel.name, steel })
+    allNames.push({ name: steel.name, nameLower: steel.name.toLowerCase(), steel })
     if (steel.aliases) {
       for (const alias of steel.aliases) {
-        allNames.push({ name: alias, steel })
+        allNames.push({ name: alias, nameLower: alias.toLowerCase(), steel })
       }
     }
   }
@@ -37,28 +37,12 @@ export function search(keyword) {
   ensureNames()
 
   const kw = keyword.trim().toLowerCase()
-  const seen = new Set()
   const results = []
 
   for (const entry of allNames) {
-    const name = entry.name.toLowerCase()
-    if (!name.includes(kw)) continue
-
-    const id = entry.steel.id
-    const dist = editDistance(kw, name)
-
-    if (!seen.has(id) || results.find(r => r.id === id && r.dist > dist)) {
-      if (!seen.has(id)) {
-        seen.add(id)
-        results.push({ id, name: entry.name, steel: entry.steel, dist })
-      } else {
-        const existing = results.find(r => r.id === id)
-        if (existing && dist < existing.dist) {
-          existing.name = entry.name
-          existing.dist = dist
-        }
-      }
-    }
+    if (!entry.nameLower.includes(kw)) continue
+    const dist = editDistance(kw, entry.nameLower)
+    results.push({ name: entry.name, steel: entry.steel, dist })
   }
 
   results.sort((a, b) => a.dist - b.dist)

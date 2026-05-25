@@ -20,7 +20,7 @@
         class="steel-item"
         @click="goDetail(item)"
       >
-        <text class="steel-name">{{ item.displayName || item.name }}<text v-if="item.displayName && item.displayName !== item.name" class="steel-sub"> ({{ item.name }})</text></text>
+        <text class="steel-name">{{ item.displayName || item.name }}</text>
         <text
           class="star-icon"
           :class="{ favorited: favSet[item.id] }"
