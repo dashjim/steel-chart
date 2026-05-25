@@ -20,7 +20,7 @@
         class="steel-item"
         @click="goDetail(item)"
       >
-        <text class="steel-name">{{ item.matchName || item.name }}</text>
+        <text class="steel-name">{{ item.matchName || item.name }}<text v-if="item.matchName && item.matchName !== item.name" class="steel-sub"> ({{ item.name }})</text></text>
         <text
           class="star-icon"
           :class="{ favorited: favSet[item.id] }"
@@ -141,6 +141,11 @@ export default {
 .steel-name {
   font-size: 30rpx;
   color: #ffffff;
+}
+
+.steel-sub {
+  color: #888;
+  font-size: 24rpx;
 }
 
 .star-icon {
