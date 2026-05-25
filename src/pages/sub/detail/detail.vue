@@ -71,7 +71,14 @@ export default {
   },
   methods: {
     onAliasClick(alias) {
-      uni.navigateBack()
+      const { search } = require('@/utils/search.js')
+      const results = search(alias)
+      const target = results.find(r => r.matchName === alias && r.id !== parseInt(this.id))
+      if (target) {
+        uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + target.id })
+      } else {
+        uni.showToast({ title: alias, icon: 'none' })
+      }
     },
     goChart() {
       uni.navigateTo({
