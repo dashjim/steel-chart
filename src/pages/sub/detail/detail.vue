@@ -18,14 +18,14 @@
       </view>
     </view>
 
-    <view class="section" v-if="steelMaker">
-      <text class="section-label">制造商:</text>
-      <text class="standard-text">{{ steelMaker }}</text>
+    <view class="section" v-if="steelMaker || steelTech">
+      <text class="standard-text" v-if="steelMaker">制造商: {{ steelMaker }}</text>
+      <text class="standard-text" v-if="steelTech">工艺: {{ steelTech }}</text>
     </view>
 
     <view class="section" v-if="steelStandard || steelCountry">
-      <text class="section-label">Standard:</text>
-      <text class="standard-text">{{ steelStandard }} {{ steelCountry ? '(' + steelCountry + ')' : '' }}</text>
+      <text class="standard-text" v-if="steelStandard">标准: {{ steelStandard }}</text>
+      <text class="standard-text" v-if="steelCountry">国家: {{ steelCountry }}</text>
     </view>
 
     <view class="section" v-if="descParts.length">
@@ -75,6 +75,7 @@ export default {
       id: null,
       steelName: '',
       steelMaker: '',
+      steelTech: '',
       steelStandard: '',
       steelCountry: '',
       descParts: [],
@@ -88,6 +89,8 @@ export default {
     if (steel) {
       this.steelName = options.name ? decodeURIComponent(options.name) : steel.name
       this.steelMaker = steel.maker || ''
+      const TECH_NAMES = { PM: '粉末冶金(PM)', CPM: '坩埚粉末冶金(CPM)', MM: 'Micro-Melt', ESR: '电渣重熔(ESR)', SF: '喷射成形(SF)', VIM: '真空感应熔炼(VIM)' }
+      this.steelTech = steel.tech ? (TECH_NAMES[steel.tech] || steel.tech) : ''
       this.steelStandard = steel.standard || ''
       this.steelCountry = steel.country || ''
       this.descParts = this.parseDescription(steel.desc || '')
