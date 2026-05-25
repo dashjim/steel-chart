@@ -75,7 +75,7 @@ export default {
       uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + item.id })
     },
     onToggleFavorite(item) {
-      toggleFavorite(item.id, item.name)
+      toggleFavorite(item.id, item.displayName || item.name)
       this.refreshFavorites()
     },
     refreshFavorites() {
