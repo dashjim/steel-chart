@@ -58,5 +58,9 @@ export function search(keyword) {
 
   results.sort((a, b) => a.dist - b.dist)
 
-  return results.map(r => ({ ...r.steel, displayName: r.name }))
+  return results.map(r => {
+    const item = r.steel
+    item.displayName = r.name
+    return item
+  })
 }
