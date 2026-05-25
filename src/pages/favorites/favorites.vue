@@ -24,7 +24,8 @@ export default {
   },
   methods: {
     goDetail(item) {
-      uni.navigateTo({ url: `/pages/sub/detail/detail?id=${item.id}` })
+      const name = encodeURIComponent(item.displayName || '')
+      uni.navigateTo({ url: `/pages/sub/detail/detail?id=${item.id}&name=${name}` })
     },
     removeFavorite(item) {
       toggleFavorite(item.id)
