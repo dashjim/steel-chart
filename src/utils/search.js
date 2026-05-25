@@ -37,14 +37,18 @@ export function search(keyword) {
   ensureNames()
 
   const kw = keyword.trim().toLowerCase()
-  const results = []
+  const best = new Map()
 
   for (const entry of allNames) {
     if (!entry.nameLower.includes(kw)) continue
+    const id = entry.steel.id
     const dist = editDistance(kw, entry.nameLower)
-    results.push({ name: entry.name, steel: entry.steel, dist })
+    if (!best.has(id) || dist < best.get(id).dist) {
+      best.set(id, { name: entry.name, steel: entry.steel, dist })
+    }
   }
 
+  const results = [...best.values()]
   results.sort((a, b) => a.dist - b.dist)
 
   return results.map(r => ({ ...r.steel, displayName: r.name }))
