@@ -18,6 +18,11 @@
       </view>
     </view>
 
+    <view class="section" v-if="steelMaker">
+      <text class="section-label">制造商:</text>
+      <text class="standard-text">{{ steelMaker }}</text>
+    </view>
+
     <view class="section" v-if="steelStandard || steelCountry">
       <text class="section-label">Standard:</text>
       <text class="standard-text">{{ steelStandard }} {{ steelCountry ? '(' + steelCountry + ')' : '' }}</text>
@@ -64,6 +69,7 @@ export default {
     return {
       id: null,
       steelName: '',
+      steelMaker: '',
       steelStandard: '',
       steelCountry: '',
       description: '',
@@ -76,6 +82,7 @@ export default {
     const steel = getSteelById(this.id)
     if (steel) {
       this.steelName = options.name ? decodeURIComponent(options.name) : steel.name
+      this.steelMaker = steel.maker || ''
       this.steelStandard = steel.standard || ''
       this.steelCountry = steel.country || ''
       this.description = steel.desc || ''
