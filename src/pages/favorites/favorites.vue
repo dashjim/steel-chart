@@ -20,7 +20,7 @@ export default {
     }
   },
   onShow() {
-    this.list = getFavorites()
+    this.list = getFavorites().slice().reverse()
   },
   methods: {
     goDetail(item) {
@@ -28,7 +28,7 @@ export default {
     },
     removeFavorite(item) {
       toggleFavorite(item.id)
-      this.list = getFavorites()
+      this.list = getFavorites().slice().reverse()
     },
   },
 }
