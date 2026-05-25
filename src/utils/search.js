@@ -1,10 +1,15 @@
 import { getAllSteels } from './data'
 
 let allNames = null
+let steelPrimaryName = null
 
 function ensureNames() {
   if (allNames) return
   const steels = getAllSteels()
+  steelPrimaryName = {}
+  for (const steel of steels) {
+    steelPrimaryName[steel.id] = steel.name.toLowerCase()
+  }
   allNames = []
   for (const steel of steels) {
     allNames.push({ name: steel.name, nameLower: steel.name.toLowerCase(), id: steel.id, isPrimary: true })
@@ -16,28 +21,11 @@ function ensureNames() {
   }
 }
 
-function editDistance(a, b) {
-  const m = a.length, n = b.length
-  if (m === 0) return n
-  if (n === 0) return m
-  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1))
-  for (let i = 0; i <= m; i++) dp[i][0] = i
-  for (let j = 0; j <= n; j++) dp[0][j] = j
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1]
-      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
-    }
-  }
-  return dp[m][n]
-}
-
 export function search(keyword) {
   if (!keyword || !keyword.trim()) return []
   ensureNames()
 
   const kw = keyword.trim().toLowerCase()
-  const steels = getAllSteels()
   const nameMap = new Map()
 
   for (const entry of allNames) {
@@ -49,34 +37,35 @@ export function search(keyword) {
     if (!existing) {
       nameMap.set(key, entry)
     } else {
-      // 优先选：1) 主名称就是这个名称的 2) 主名称包含搜索词的
-      const newSteel = steels.find(s => s.id === entry.id)
-      const oldSteel = steels.find(s => s.id === existing.id)
-      const newPrimaryMatch = newSteel && newSteel.name.toLowerCase() === key
-      const oldPrimaryMatch = oldSteel && oldSteel.name.toLowerCase() === key
-      if (newPrimaryMatch && !oldPrimaryMatch) {
+      // 优先选主名称就是这个名称的钢材
+      const newIsPrimaryName = steelPrimaryName[entry.id] === key
+      const oldIsPrimaryName = steelPrimaryName[existing.id] === key
+      if (newIsPrimaryName && !oldIsPrimaryName) {
         nameMap.set(key, entry)
-      } else if (!oldPrimaryMatch && !newPrimaryMatch) {
-        const newPrimaryContains = newSteel && newSteel.name.toLowerCase().includes(kw)
-        const oldPrimaryContains = oldSteel && oldSteel.name.toLowerCase().includes(kw)
-        if (newPrimaryContains && !oldPrimaryContains) {
+      } else if (!oldIsPrimaryName && !newIsPrimaryName) {
+        // 其次选主名称包含搜索词的
+        const newContains = steelPrimaryName[entry.id].includes(kw)
+        const oldContains = steelPrimaryName[existing.id].includes(kw)
+        if (newContains && !oldContains) {
           nameMap.set(key, entry)
         }
       }
     }
   }
 
-  const results = [...nameMap.values()].map(entry => ({
-    displayName: entry.name,
-    id: entry.id,
-    dist: editDistance(kw, entry.nameLower)
-  }))
+  const results = [...nameMap.values()]
 
-  results.sort((a, b) => a.dist - b.dist)
+  // 排序：精确匹配 > 前缀 > 包含，同级按名称长度
+  results.sort((a, b) => {
+    const aExact = a.nameLower === kw ? 0 : a.nameLower.startsWith(kw) ? 1 : 2
+    const bExact = b.nameLower === kw ? 0 : b.nameLower.startsWith(kw) ? 1 : 2
+    if (aExact !== bExact) return aExact - bExact
+    return a.name.length - b.name.length
+  })
 
   return results.map(r => ({
     id: r.id,
-    name: r.displayName,
-    displayName: r.displayName
+    name: r.name,
+    displayName: r.name
   }))
 }
