@@ -1,208 +1,100 @@
 <template>
-  <view class="elements-page">
-    <!-- Header -->
+  <view class="page">
     <view class="header">
-      <view class="header-left" @click="onCancel">
-        <text class="header-btn">Cancel</text>
-      </view>
-      <view class="header-center">
-        <text class="header-title">Choose Elements</text>
-      </view>
-      <view class="header-right" @click="onRebuild">
-        <text class="header-btn header-btn-primary">Rebuild</text>
-      </view>
+      <text class="title">元素成分</text>
     </view>
-
-    <!-- Element list -->
-    <scroll-view scroll-y class="element-list">
+    <view class="element-list">
       <view
-        v-for="item in elementList"
+        v-for="item in elementsList"
         :key="item.symbol"
         class="element-item"
-        @click="toggleElement(item.symbol)"
+        @click="goElementInfo(item.symbol)"
       >
-        <view class="element-checkbox">
-          <view
-            class="checkbox-inner"
-            :class="{ checked: selected.includes(item.symbol) }"
-          >
-            <text v-if="selected.includes(item.symbol)" class="check-mark">&#x2713;</text>
-          </view>
-        </view>
-        <view class="element-info">
-          <text class="element-name">{{ item.name }} ({{ item.symbol }})</text>
-        </view>
-        <view class="element-action" @click.stop="onInfo(item)">
-          <text class="info-btn">i</text>
+        <view class="element-row">
+          <text class="element-name">{{ item.name }}({{ item.symbol }})</text>
+          <text class="element-value">{{ item.value }}</text>
         </view>
       </view>
-    </scroll-view>
+    </view>
   </view>
 </template>
 
 <script>
-const ELEMENTS = [
-  { symbol: 'C', name: 'Carbon' },
-  { symbol: 'Cr', name: 'Chromium' },
-  { symbol: 'Mo', name: 'Molybdenum' },
-  { symbol: 'V', name: 'Vanadium' },
-  { symbol: 'W', name: 'Tungsten' },
-  { symbol: 'Co', name: 'Cobalt' },
-  { symbol: 'Ni', name: 'Nickel' },
-  { symbol: 'Mn', name: 'Manganese' },
-  { symbol: 'Si', name: 'Silicon' },
-  { symbol: 'S', name: 'Sulfur' },
-  { symbol: 'P', name: 'Phosphorus' },
-  { symbol: 'Cu', name: 'Copper' },
-  { symbol: 'Nb', name: 'Niobium' },
-  { symbol: 'N', name: 'Nitrogen' }
-]
+import { getSteelById } from '@/utils/data.js'
+
+const ELEMENT_NAMES = {
+  C: '碳', Cr: '铬', Mo: '钼', V: '钒', W: '钨',
+  Co: '钴', Ni: '镍', Mn: '锰', Si: '硅',
+  S: '硫', P: '磷', Cu: '铜', Nb: '铌', N: '氮'
+}
 
 export default {
   data() {
     return {
-      elementList: ELEMENTS,
-      selected: ELEMENTS.map(e => e.symbol)
+      elementsList: []
     }
   },
   onLoad(query) {
-    if (query && query.selected) {
-      this.selected = query.selected.split(',').filter(Boolean)
+    if (query && query.id) {
+      const steel = getSteelById(query.id)
+      if (steel && steel.composition) {
+        this.elementsList = Object.entries(steel.composition).map(([symbol, vals]) => ({
+          symbol,
+          name: ELEMENT_NAMES[symbol] || symbol,
+          value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`
+        }))
+      }
     }
   },
   methods: {
-    toggleElement(symbol) {
-      const idx = this.selected.indexOf(symbol)
-      if (idx >= 0) {
-        this.selected.splice(idx, 1)
-      } else {
-        this.selected.push(symbol)
-      }
-    },
-    onCancel() {
-      uni.navigateBack()
-    },
-    onRebuild() {
-      const eventChannel = this.getOpenerEventChannel()
-      if (eventChannel) {
-        eventChannel.emit('updateElements', { elements: [...this.selected] })
-      }
-      uni.navigateBack()
-    },
-    onInfo(item) {
-      uni.showToast({
-        title: `${item.name} (${item.symbol})`,
-        icon: 'none'
+    goElementInfo(symbol) {
+      uni.navigateTo({
+        url: '/pages/sub/element-info/element-info?element=' + symbol
       })
     }
   }
 }
 </script>
 
-<style scoped>
-.elements-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+<style>
+.page {
   background-color: #000000;
+  min-height: 100vh;
+  padding: 30rpx;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 30rpx;
-  padding-top: calc(20rpx + env(safe-area-inset-top));
-  border-bottom: 1rpx solid #333333;
+  margin-bottom: 30rpx;
 }
 
-.header-left,
-.header-right {
-  width: 120rpx;
-}
-
-.header-center {
-  flex: 1;
-  text-align: center;
-}
-
-.header-title {
-  color: #FFFFFF;
-  font-size: 32rpx;
-  font-weight: bold;
-}
-
-.header-btn {
-  color: #4A90D9;
-  font-size: 28rpx;
-}
-
-.header-btn-primary {
+.title {
+  color: #ffffff;
+  font-size: 34rpx;
   font-weight: bold;
 }
 
 .element-list {
-  flex: 1;
+  border-top: 1rpx solid #333;
 }
 
 .element-item {
+  border-bottom: 1rpx solid #333;
+  padding: 28rpx 16rpx;
+}
+
+.element-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #222222;
-}
-
-.element-checkbox {
-  margin-right: 24rpx;
-}
-
-.checkbox-inner {
-  width: 40rpx;
-  height: 40rpx;
-  border: 2rpx solid #555555;
-  border-radius: 6rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.checkbox-inner.checked {
-  background-color: #4A90D9;
-  border-color: #4A90D9;
-}
-
-.check-mark {
-  color: #FFFFFF;
-  font-size: 24rpx;
-}
-
-.element-info {
-  flex: 1;
 }
 
 .element-name {
-  color: #FFFFFF;
-  font-size: 28rpx;
+  color: #ffffff;
+  font-size: 30rpx;
 }
 
-.element-action {
-  width: 50rpx;
-  height: 50rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.info-btn {
-  color: #4A90D9;
+.element-value {
+  color: #cccccc;
   font-size: 28rpx;
-  font-style: italic;
-  font-weight: bold;
-  border: 2rpx solid #4A90D9;
-  border-radius: 50%;
-  width: 36rpx;
-  height: 36rpx;
-  line-height: 36rpx;
-  text-align: center;
 }
 </style>
