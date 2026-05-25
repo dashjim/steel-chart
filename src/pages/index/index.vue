@@ -24,7 +24,7 @@
         <text
           class="star-icon"
           :class="{ favorited: favSet[item.id] }"
-          @click.stop="onToggleFavorite(item.id)"
+          @click.stop="onToggleFavorite(item)"
         >&#x2605;</text>
       </view>
       <view v-if="keyword && displayList.length === 0" class="empty-tip">
@@ -74,15 +74,16 @@ export default {
     goDetail(item) {
       uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + item.id })
     },
-    onToggleFavorite(id) {
-      toggleFavorite(id)
+    onToggleFavorite(item) {
+      const displayName = item.matchName || item.name
+      toggleFavorite(item.id, displayName)
       this.refreshFavorites()
     },
     refreshFavorites() {
       const favs = getFavorites()
       const set = {}
-      for (const id of favs) {
-        set[id] = true
+      for (const f of favs) {
+        set[f.id] = true
       }
       this.favSet = set
     }
