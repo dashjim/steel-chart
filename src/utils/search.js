@@ -37,13 +37,26 @@ function editDistance(a, b) {
   return dp[m][n]
 }
 
-export function sortByEditDistance(results, keyword) {
+export function fuzzySearch(keyword) {
+  ensureNames()
   const kw = keyword.trim().toLowerCase()
-  return results.slice().sort((a, b) => {
-    const distA = editDistance(kw, a.displayName.toLowerCase())
-    const distB = editDistance(kw, b.displayName.toLowerCase())
-    return distA - distB
-  })
+  const nameMap = new Map()
+
+  for (const entry of allNames) {
+    const key = entry.nameLower
+    if (nameMap.has(key)) continue
+    const dist = editDistance(kw, key)
+    nameMap.set(key, { name: entry.name, id: entry.id, dist })
+  }
+
+  const results = [...nameMap.values()]
+  results.sort((a, b) => a.dist - b.dist)
+
+  return results.slice(0, 50).map(r => ({
+    id: r.id,
+    name: r.name,
+    displayName: r.name
+  }))
 }
 
 export function search(keyword) {

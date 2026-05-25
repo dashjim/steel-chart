@@ -14,11 +14,11 @@
         @blur="searchFocused = false"
       />
       <text
-        v-if="keyword && searchResults.length > 1"
+        v-if="keyword"
         class="sort-btn"
         :class="{ disabled: sorting }"
         @click="onSort"
-      >{{ sorting ? '排序中...' : '精排' }}</text>
+      >{{ sorting ? '搜索中...' : '模糊' }}</text>
     </view>
     <scroll-view class="steel-list" scroll-y>
       <view
@@ -43,7 +43,7 @@
 
 <script>
 import { getAllSteels } from '@/utils/data'
-import { search, sortByEditDistance } from '@/utils/search'
+import { search, fuzzySearch } from '@/utils/search'
 import { getFavorites, toggleFavorite } from '@/utils/favorites'
 
 export default {
@@ -80,10 +80,10 @@ export default {
       }
     },
     onSort() {
-      if (this.sorting || !this.keyword || this.searchResults.length <= 1) return
+      if (this.sorting || !this.keyword) return
       this.sorting = true
       setTimeout(() => {
-        this.searchResults = sortByEditDistance(this.searchResults, this.keyword)
+        this.searchResults = fuzzySearch(this.keyword)
         this.sorting = false
       }, 50)
     },
