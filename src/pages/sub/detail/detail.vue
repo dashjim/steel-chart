@@ -19,20 +19,20 @@
     </view>
 
     <view class="section" v-if="steelMaker || steelTech">
-      <text class="standard-text" v-if="steelMaker">制造商: {{ steelMaker }}</text>
-      <text class="standard-text" v-if="steelTech">工艺: {{ steelTech }}</text>
+      <view class="info-row" v-if="steelMaker"><text class="info-text" user-select>制造商: {{ steelMaker }}</text></view>
+      <view class="info-row" v-if="steelTech"><text class="info-text" user-select>工艺: {{ steelTech }}</text></view>
     </view>
 
     <view class="section" v-if="steelStandard || steelCountry">
-      <text class="standard-text" v-if="steelStandard">标准: {{ steelStandard }}</text>
-      <text class="standard-text" v-if="steelCountry">国家: {{ steelCountry }}</text>
+      <view class="info-row" v-if="steelStandard"><text class="info-text" user-select>标准: {{ steelStandard }}</text></view>
+      <view class="info-row" v-if="steelCountry"><text class="info-text" user-select>国家: {{ steelCountry }}</text></view>
     </view>
 
     <view class="section" v-if="descParts.length">
       <text class="section-label">Notes:</text>
       <view class="description-text">
         <template v-for="(part, idx) in descParts">
-          <text v-if="part.type === 'text'" :key="'t'+idx">{{ part.value }}</text>
+          <text v-if="part.type === 'text'" :key="'t'+idx" user-select>{{ part.value }}</text>
           <text v-else :key="'l'+idx" class="desc-link" @click="goSteelByName(part.id, part.value)">{{ part.value }}</text>
         </template>
       </view>
@@ -239,6 +239,15 @@ export default {
 .comp-val {
   color: #cccccc;
   font-size: 24rpx;
+}
+
+.info-row {
+  margin-bottom: 8rpx;
+}
+
+.info-text {
+  color: #ffffff;
+  font-size: 28rpx;
 }
 
 .standard-text {
