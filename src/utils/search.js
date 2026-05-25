@@ -9,13 +9,14 @@ export function search(keyword) {
 
   for (const steel of allSteels) {
     const name = steel.name.toLowerCase()
-    if (name.includes(kw)) {
-      let score = 0
-      if (name === kw) score = 3
-      else if (name.startsWith(kw)) score = 2
-      else score = 1
-      results.push({ steel, score, len: steel.name.length })
-    }
+    if (!name.includes(kw)) continue
+
+    let score = 0
+    if (name === kw) score = 3
+    else if (name.startsWith(kw)) score = 2
+    else score = 1
+
+    results.push({ steel, score, len: steel.name.length })
   }
 
   results.sort((a, b) => {
