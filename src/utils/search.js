@@ -28,29 +28,34 @@ export function search(keyword) {
   const seen = new Set()
 
   for (const entry of indexEntries) {
-    let matched = false
-    let matchType = 3 // contains
+    if (seen.has(entry.id)) continue
 
-    for (const name of entry.namesLower) {
+    let bestMatch = null
+    let matchType = 0
+
+    for (let i = 0; i < entry.namesLower.length; i++) {
+      const name = entry.namesLower[i]
       if (name === kw) {
-        matchType = 1 // exact
-        matched = true
+        bestMatch = entry.names[i]
+        matchType = 3
         break
-      } else if (name.startsWith(kw)) {
-        if (matchType > 2) matchType = 2 // prefix
-        matched = true
-      } else if (name.includes(kw)) {
-        matched = true
+      } else if (name.startsWith(kw) && matchType < 2) {
+        bestMatch = entry.names[i]
+        matchType = 2
+      } else if (name.includes(kw) && matchType < 1) {
+        bestMatch = entry.names[i]
+        matchType = 1
       }
     }
 
-    if (matched && !seen.has(entry.id)) {
+    if (bestMatch && !seen.has(entry.id)) {
       seen.add(entry.id)
       const steel = getSteelById(entry.id)
       if (steel) {
-        if (matchType === 1) exact.push(steel)
-        else if (matchType === 2) prefix.push(steel)
-        else contains.push(steel)
+        const result = { ...steel, matchName: bestMatch }
+        if (matchType === 3) exact.push(result)
+        else if (matchType === 2) prefix.push(result)
+        else contains.push(result)
       }
     }
   }

@@ -20,7 +20,7 @@
         class="steel-item"
         @click="goDetail(item)"
       >
-        <text class="steel-name">{{ item.name }}</text>
+        <text class="steel-name">{{ item.matchName || item.name }}</text>
         <text
           class="star-icon"
           :class="{ favorited: favSet[item.id] }"
