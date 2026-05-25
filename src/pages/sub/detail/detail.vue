@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <view class="header">
-      <text class="title">{{ steel ? steel.name : '' }}</text>
+      <text class="title">{{ steelName }}</text>
     </view>
 
     <view class="section" v-if="compList.length">
@@ -18,9 +18,9 @@
       </view>
     </view>
 
-    <view class="section" v-if="steel && (steel.standard || steel.country)">
+    <view class="section" v-if="steelStandard || steelCountry">
       <text class="section-label">Standard:</text>
-      <text class="standard-text">{{ steel.standard || '' }} {{ steel.country ? '(' + steel.country + ')' : '' }}</text>
+      <text class="standard-text">{{ steelStandard }} {{ steelCountry ? '(' + steelCountry + ')' : '' }}</text>
     </view>
 
     <view class="section" v-if="description">
@@ -28,12 +28,12 @@
       <text class="description-text">{{ description }}</text>
     </view>
 
-    <view class="section" v-if="steel && steel.aliases && steel.aliases.length">
+    <view class="section" v-if="aliasList.length">
       <text class="section-label">Cross-References:</text>
       <view class="aliases-list">
         <text
           class="alias-link"
-          v-for="(alias, index) in steel.aliases"
+          v-for="(alias, index) in aliasList"
           :key="index"
           @click="onAliasClick(alias)"
         >{{ alias }}</text>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getSteelById, getDescription } from '@/utils/data.js'
+import { getSteelById } from '@/utils/data.js'
 import { search } from '@/utils/search.js'
 
 const EL_NAMES = {
@@ -63,21 +63,32 @@ export default {
   data() {
     return {
       id: null,
-      steel: null,
+      steelName: '',
+      steelStandard: '',
+      steelCountry: '',
       description: '',
-      compList: []
+      compList: [],
+      aliasList: []
     }
   },
   onLoad(options) {
     this.id = options.id
-    this.steel = getSteelById(this.id)
-    this.description = getDescription(this.id)
-    if (this.steel && this.steel.composition) {
-      this.compList = Object.entries(this.steel.composition).map(([el, vals]) => ({
-        el,
-        zhName: EL_NAMES[el] || el,
-        value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`
-      }))
+    const steel = getSteelById(this.id)
+    if (steel) {
+      this.steelName = steel.name
+      this.steelStandard = steel.standard || ''
+      this.steelCountry = steel.country || ''
+      this.description = steel.desc || ''
+      if (steel.composition) {
+        this.compList = Object.entries(steel.composition).map(([el, vals]) => ({
+          el,
+          zhName: EL_NAMES[el] || el,
+          value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`
+        }))
+      }
+      if (steel.aliases) {
+        this.aliasList = steel.aliases.slice()
+      }
     }
   },
   methods: {
