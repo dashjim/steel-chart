@@ -4,16 +4,16 @@
       <text class="title">{{ steel ? steel.name : '' }}</text>
     </view>
 
-    <view class="section" v-if="steel && steel.composition">
+    <view class="section" v-if="compList.length">
       <view class="comp-list">
         <view
           class="comp-item"
-          v-for="(vals, el) in steel.composition"
-          :key="el"
-          @click="goElementInfo(el)"
+          v-for="item in compList"
+          :key="item.el"
+          @click="goElementInfo(item.el)"
         >
-          <text class="comp-el">{{ el }}({{ elNames[el] || el }})</text>
-          <text class="comp-val">{{ formatComp(vals) }}</text>
+          <text class="comp-el">{{ item.el }}({{ item.zhName }})</text>
+          <text class="comp-val">{{ item.value }}</text>
         </view>
       </view>
     </view>
@@ -65,19 +65,22 @@ export default {
       id: null,
       steel: null,
       description: '',
-      elNames: EL_NAMES
+      compList: []
     }
   },
   onLoad(options) {
     this.id = options.id
     this.steel = getSteelById(this.id)
     this.description = getDescription(this.id)
+    if (this.steel && this.steel.composition) {
+      this.compList = Object.entries(this.steel.composition).map(([el, vals]) => ({
+        el,
+        zhName: EL_NAMES[el] || el,
+        value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`
+      }))
+    }
   },
   methods: {
-    formatComp(vals) {
-      if (vals.length === 2) return `${vals[0]}-${vals[1]}%`
-      return `${vals[0]}%`
-    },
     goElementInfo(el) {
       uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
     },

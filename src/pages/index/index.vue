@@ -15,8 +15,8 @@
     </view>
     <scroll-view class="steel-list" scroll-y>
       <view
-        v-for="item in displayList"
-        :key="item.id"
+        v-for="(item, idx) in displayList"
+        :key="idx"
         class="steel-item"
         @click="goDetail(item)"
       >
