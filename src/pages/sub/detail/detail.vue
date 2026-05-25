@@ -28,9 +28,14 @@
       <text class="standard-text">{{ steelStandard }} {{ steelCountry ? '(' + steelCountry + ')' : '' }}</text>
     </view>
 
-    <view class="section" v-if="description">
+    <view class="section" v-if="descParts.length">
       <text class="section-label">Notes:</text>
-      <text class="description-text">{{ description }}</text>
+      <view class="description-text">
+        <template v-for="(part, idx) in descParts">
+          <text v-if="part.type === 'text'" :key="'t'+idx">{{ part.value }}</text>
+          <text v-else :key="'l'+idx" class="desc-link" @click="goSteelByName(part.id, part.value)">{{ part.value }}</text>
+        </template>
+      </view>
     </view>
 
     <view class="section" v-if="aliasList.length">
@@ -55,7 +60,7 @@
 </template>
 
 <script>
-import { getSteelById } from '@/utils/data.js'
+import { getSteelById, getAllSteels } from '@/utils/data.js'
 import { search } from '@/utils/search.js'
 
 const EL_NAMES = {
@@ -72,7 +77,7 @@ export default {
       steelMaker: '',
       steelStandard: '',
       steelCountry: '',
-      description: '',
+      descParts: [],
       compList: [],
       aliasList: []
     }
@@ -85,7 +90,7 @@ export default {
       this.steelMaker = steel.maker || ''
       this.steelStandard = steel.standard || ''
       this.steelCountry = steel.country || ''
-      this.description = steel.desc || ''
+      this.descParts = this.parseDescription(steel.desc || '')
       if (steel.composition) {
         this.compList = Object.entries(steel.composition).map(([el, vals]) => ({
           el,
@@ -99,6 +104,60 @@ export default {
     }
   },
   methods: {
+    parseDescription(desc) {
+      if (!desc) return []
+      const allSteels = getAllSteels()
+      // 收集所有名称（主名称+别名），长度>=3，按长度降序（优先匹配长名称）
+      const names = []
+      for (const s of allSteels) {
+        if (s.id === parseInt(this.id)) continue
+        if (s.name.length >= 3) names.push({ name: s.name, id: s.id })
+        if (s.aliases) {
+          for (const a of s.aliases) {
+            if (a.length >= 3) names.push({ name: a, id: s.id })
+          }
+        }
+      }
+      names.sort((a, b) => b.name.length - a.name.length)
+
+      // 标记描述中所有匹配位置
+      const marks = []
+      const usedRanges = []
+      for (const entry of names) {
+        let pos = 0
+        while (true) {
+          const idx = desc.indexOf(entry.name, pos)
+          if (idx === -1) break
+          const end = idx + entry.name.length
+          // 检查不重叠
+          const overlap = usedRanges.some(r => idx < r[1] && end > r[0])
+          if (!overlap) {
+            marks.push({ start: idx, end, name: entry.name, id: entry.id })
+            usedRanges.push([idx, end])
+          }
+          pos = idx + 1
+        }
+      }
+      marks.sort((a, b) => a.start - b.start)
+
+      // 分段
+      const parts = []
+      let cursor = 0
+      for (const m of marks) {
+        if (m.start > cursor) {
+          parts.push({ type: 'text', value: desc.substring(cursor, m.start) })
+        }
+        parts.push({ type: 'link', value: m.name, id: m.id })
+        cursor = m.end
+      }
+      if (cursor < desc.length) {
+        parts.push({ type: 'text', value: desc.substring(cursor) })
+      }
+      return parts.length ? parts : [{ type: 'text', value: desc }]
+    },
+    goSteelByName(id, name) {
+      uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + id + '&name=' + encodeURIComponent(name) })
+    },
     goElementInfo(index) {
       const el = this.compList[index] && this.compList[index].el
       if (el) uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
@@ -189,6 +248,11 @@ export default {
   font-size: 26rpx;
   font-style: italic;
   line-height: 1.6;
+}
+
+.desc-link {
+  color: #FFA500;
+  text-decoration: underline;
 }
 
 .aliases-list {
