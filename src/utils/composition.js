@@ -17,59 +17,54 @@ export function getMinMax(comp) {
 }
 
 /**
- * Convert mass% composition to atomic% (atoms)
- * @param {Object} composition - e.g. { C: [0.42, 0.50], Mn: [0.60, 0.90] }
- * @returns {Object} - same structure but values in atomic%
+ * Convert mass% to atoms (mass% / atomicMass * 1000)
+ * Represents relative number of atoms per 1000g alloy
  */
 export function toAtoms(composition) {
   if (!composition) return {}
   const result = {}
-  // Use midpoint for conversion calculation
-  const entries = Object.entries(composition)
-
-  // Calculate moles for each element using midpoint
-  const moles = {}
-  let totalMoles = 0
-  for (const [el, vals] of entries) {
-    const mid = vals.length === 1 ? vals[0] : (vals[0] + vals[1]) / 2
-    const mass = ATOMIC_MASS[el]
-    if (!mass) continue
-    moles[el] = mid / mass
-    totalMoles += mid / mass
-  }
-  // Add Fe balance
-  let totalMass = 0
-  for (const [, vals] of entries) {
-    totalMass += vals.length === 1 ? vals[0] : (vals[0] + vals[1]) / 2
-  }
-  const feMass = Math.max(0, 100 - totalMass)
-  const feMoles = feMass / ATOMIC_MASS.Fe
-  totalMoles += feMoles
-
-  if (totalMoles === 0) return {}
-
-  // Convert each element preserving min/max ratio
-  for (const [el, vals] of entries) {
+  for (const [el, vals] of Object.entries(composition)) {
     const mass = ATOMIC_MASS[el]
     if (!mass) continue
     if (vals.length === 1) {
-      const atomPct = (vals[0] / mass / totalMoles) * 100
-      result[el] = [atomPct]
+      result[el] = [vals[0] / mass * 1000]
     } else {
-      const minAtom = (vals[0] / mass / totalMoles) * 100
-      const maxAtom = (vals[1] / mass / totalMoles) * 100
-      result[el] = [minAtom, maxAtom]
+      result[el] = [vals[0] / mass * 1000, vals[1] / mass * 1000]
     }
   }
   return result
 }
 
 /**
- * Convert mass% composition to molar%
- * Same as toAtoms (molar% and atomic% are equivalent for elements)
- * @param {Object} composition
- * @returns {Object}
+ * Convert mass% to molar% (normalized atomic%)
+ * Each element's moles / total moles * 100
  */
 export function toMolar(composition) {
-  return toAtoms(composition)
+  if (!composition) return {}
+  const entries = Object.entries(composition)
+  let totalMoles = 0
+  for (const [el, vals] of entries) {
+    const mass = ATOMIC_MASS[el]
+    if (!mass) continue
+    const mid = vals.length === 1 ? vals[0] : (vals[0] + vals[1]) / 2
+    totalMoles += mid / mass
+  }
+  let totalMass = 0
+  for (const [, vals] of entries) {
+    totalMass += vals.length === 1 ? vals[0] : (vals[0] + vals[1]) / 2
+  }
+  totalMoles += Math.max(0, 100 - totalMass) / ATOMIC_MASS.Fe
+
+  if (totalMoles === 0) return {}
+  const result = {}
+  for (const [el, vals] of entries) {
+    const mass = ATOMIC_MASS[el]
+    if (!mass) continue
+    if (vals.length === 1) {
+      result[el] = [(vals[0] / mass / totalMoles) * 100]
+    } else {
+      result[el] = [(vals[0] / mass / totalMoles) * 100, (vals[1] / mass / totalMoles) * 100]
+    }
+  }
+  return result
 }

@@ -2,9 +2,9 @@
   <view class="chart-page">
     <view class="header">
       <view class="mode-tabs">
-        <text :class="['mode-tab', mode === 'mass' ? 'active' : '']" @click="mode='mass'">Mass %</text>
-        <text :class="['mode-tab', mode === 'atoms' ? 'active' : '']" @click="mode='atoms'">Atoms</text>
-        <text :class="['mode-tab', mode === 'molar' ? 'active' : '']" @click="mode='molar'">Molar %</text>
+        <text :class="['mode-tab', mode === 'mass' ? 'active' : '']" @click="mode='mass'">质量%</text>
+        <text :class="['mode-tab', mode === 'atoms' ? 'active' : '']" @click="mode='atoms'">原子数</text>
+        <text :class="['mode-tab', mode === 'molar' ? 'active' : '']" @click="mode='molar'">摩尔%</text>
       </view>
     </view>
 
