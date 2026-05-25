@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <view class="search-bar" :class="{ focused: searchFocused }">
+    <view class="search-bar" :class="{ focused: searchFocused, sorting: sorting }">
       <text class="search-icon">&#x1F50D;</text>
       <input
         class="search-input"
@@ -8,10 +8,17 @@
         placeholder="搜索钢材..."
         placeholder-style="color: #666"
         :value="keyword"
+        :disabled="sorting"
         @input="onInput"
         @focus="searchFocused = true"
         @blur="searchFocused = false"
       />
+      <text
+        v-if="keyword && searchResults.length > 1"
+        class="sort-btn"
+        :class="{ disabled: sorting }"
+        @click="onSort"
+      >{{ sorting ? '排序中...' : '精排' }}</text>
     </view>
     <scroll-view class="steel-list" scroll-y>
       <view
@@ -36,7 +43,7 @@
 
 <script>
 import { getAllSteels } from '@/utils/data'
-import { search } from '@/utils/search'
+import { search, sortByEditDistance } from '@/utils/search'
 import { getFavorites, toggleFavorite } from '@/utils/favorites'
 
 export default {
@@ -46,6 +53,7 @@ export default {
       allSteels: [],
       searchResults: [],
       searchFocused: false,
+      sorting: false,
       favSet: {}
     }
   },
@@ -70,6 +78,14 @@ export default {
       } else {
         this.searchResults = []
       }
+    },
+    onSort() {
+      if (this.sorting || !this.keyword || this.searchResults.length <= 1) return
+      this.sorting = true
+      setTimeout(() => {
+        this.searchResults = sortByEditDistance(this.searchResults, this.keyword)
+        this.sorting = false
+      }, 50)
     },
     goDetail(item) {
       const name = encodeURIComponent(item.displayName || item.name)
@@ -112,6 +128,25 @@ export default {
 
 .search-bar.focused {
   border-color: #ff8c00;
+}
+
+.search-bar.sorting {
+  border-color: #4A90D9;
+}
+
+.sort-btn {
+  font-size: 22rpx;
+  color: #4A90D9;
+  padding: 8rpx 16rpx;
+  border: 1rpx solid #4A90D9;
+  border-radius: 16rpx;
+  margin-left: 12rpx;
+  white-space: nowrap;
+}
+
+.sort-btn.disabled {
+  color: #666;
+  border-color: #666;
 }
 
 .search-icon {
