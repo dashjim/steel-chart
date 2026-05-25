@@ -97,11 +97,9 @@ export default {
     },
     onAliasClick(alias) {
       const results = search(alias)
-      const target = results.find(r => r.displayName === alias && r.id !== parseInt(this.id))
+      const target = results.find(r => r.displayName === alias)
       if (target) {
-        uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + target.id })
-      } else {
-        uni.showToast({ title: alias, icon: 'none' })
+        uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + target.id + '&name=' + encodeURIComponent(alias) })
       }
     },
     goChart() {
