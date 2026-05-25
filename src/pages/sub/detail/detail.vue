@@ -8,9 +8,9 @@
       <view class="comp-list">
         <view
           class="comp-item"
-          v-for="item in compList"
-          :key="item.el"
-          @click="goElementInfo(item.el)"
+          v-for="(item, index) in compList"
+          :key="index"
+          @click="goElementInfo(index)"
         >
           <text class="comp-el">{{ item.el }}({{ item.zhName }})</text>
           <text class="comp-val">{{ item.value }}</text>
@@ -35,7 +35,7 @@
           class="alias-link"
           v-for="(alias, index) in aliasList"
           :key="index"
-          @click="onAliasClick(alias)"
+          @click="onAliasClick(index)"
         >{{ alias }}</text>
       </view>
     </view>
@@ -92,10 +92,13 @@ export default {
     }
   },
   methods: {
-    goElementInfo(el) {
-      uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
+    goElementInfo(index) {
+      const el = this.compList[index] && this.compList[index].el
+      if (el) uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
     },
-    onAliasClick(alias) {
+    onAliasClick(index) {
+      const alias = this.aliasList[index]
+      if (!alias) return
       const results = search(alias)
       const target = results.find(r => r.displayName === alias)
       if (target) {
