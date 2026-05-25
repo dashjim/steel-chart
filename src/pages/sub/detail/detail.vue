@@ -5,7 +5,17 @@
     </view>
 
     <view class="section" v-if="steel && steel.composition">
-      <text class="composition-text">{{ compositionText }}</text>
+      <view class="comp-list">
+        <view
+          class="comp-item"
+          v-for="(vals, el) in steel.composition"
+          :key="el"
+          @click="goElementInfo(el)"
+        >
+          <text class="comp-el">{{ el }}</text>
+          <text class="comp-val">{{ formatComp(vals) }}</text>
+        </view>
+      </view>
     </view>
 
     <view class="section" v-if="steel && (steel.standard || steel.country)">
@@ -50,26 +60,19 @@ export default {
       description: ''
     }
   },
-  computed: {
-    compositionText() {
-      if (!this.steel || !this.steel.composition) return ''
-      const parts = []
-      for (const [element, values] of Object.entries(this.steel.composition)) {
-        if (Array.isArray(values) && values.length === 2) {
-          parts.push(`${element}: ${values[0]}-${values[1]}`)
-        } else if (Array.isArray(values) && values.length === 1) {
-          parts.push(`${element}: ${values[0]}`)
-        }
-      }
-      return parts.join('; ')
-    }
-  },
   onLoad(options) {
     this.id = options.id
     this.steel = getSteelById(this.id)
     this.description = getDescription(this.id)
   },
   methods: {
+    formatComp(vals) {
+      if (vals.length === 2) return `${vals[0]}-${vals[1]}%`
+      return `${vals[0]}%`
+    },
+    goElementInfo(el) {
+      uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
+    },
     onAliasClick(alias) {
       const { search } = require('@/utils/search.js')
       const results = search(alias)
@@ -121,10 +124,30 @@ export default {
   margin-bottom: 16rpx;
 }
 
-.composition-text {
-  color: #ffffff;
+.comp-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.comp-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  padding: 8rpx 16rpx;
+  background-color: #1a1a1a;
+  border-radius: 8rpx;
+}
+
+.comp-el {
+  color: #FFA500;
   font-size: 28rpx;
-  line-height: 1.6;
+  font-weight: bold;
+}
+
+.comp-val {
+  color: #cccccc;
+  font-size: 24rpx;
 }
 
 .standard-text {
