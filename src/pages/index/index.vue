@@ -20,7 +20,7 @@
         class="steel-item"
         @click="goDetail(item)"
       >
-        <text class="steel-name">{{ item.matchName || item.name }}<text v-if="item.matchName && item.matchName !== item.name" class="steel-sub"> ({{ item.name }})</text></text>
+        <text class="steel-name">{{ item.name }}</text>
         <text
           class="star-icon"
           :class="{ favorited: favSet[item.id] }"
@@ -75,8 +75,7 @@ export default {
       uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + item.id })
     },
     onToggleFavorite(item) {
-      const displayName = item.matchName || item.name
-      toggleFavorite(item.id, displayName)
+      toggleFavorite(item.id, item.name)
       this.refreshFavorites()
     },
     refreshFavorites() {
