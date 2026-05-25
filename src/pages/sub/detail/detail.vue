@@ -75,7 +75,7 @@ export default {
     this.id = options.id
     const steel = getSteelById(this.id)
     if (steel) {
-      this.steelName = steel.name
+      this.steelName = options.name ? decodeURIComponent(options.name) : steel.name
       this.steelStandard = steel.standard || ''
       this.steelCountry = steel.country || ''
       this.description = steel.desc || ''

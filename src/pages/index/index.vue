@@ -72,7 +72,8 @@ export default {
       }
     },
     goDetail(item) {
-      uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + item.id })
+      const name = encodeURIComponent(item.displayName || item.name)
+      uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + item.id + '&name=' + name })
     },
     onToggleFavorite(item) {
       toggleFavorite(item.id, item.displayName || item.name)
