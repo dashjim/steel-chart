@@ -104,7 +104,7 @@ export default {
     },
     goChart() {
       uni.navigateTo({
-        url: '/pages/sub/chart/chart?ids=' + this.id
+        url: '/pages/sub/chart/chart?ids=' + this.id + '&name=' + encodeURIComponent(this.steelName)
       })
     }
   }

@@ -1,7 +1,11 @@
 <template>
   <view class="chart-page">
     <view class="header">
-      <text class="mode-label">{{ modeLabel }}</text>
+      <view class="mode-tabs">
+        <text :class="['mode-tab', mode === 'mass' ? 'active' : '']" @click="mode='mass'">Mass %</text>
+        <text :class="['mode-tab', mode === 'atoms' ? 'active' : '']" @click="mode='atoms'">Atoms</text>
+        <text :class="['mode-tab', mode === 'molar' ? 'active' : '']" @click="mode='molar'">Molar %</text>
+      </view>
     </view>
 
     <view
@@ -74,7 +78,12 @@ export default {
   onLoad(query) {
     if (query && query.ids) {
       const ids = query.ids.split(',').map(Number)
-      this.selectedSteels = ids.map(id => getSteelById(id)).filter(Boolean)
+      const names = query.name ? [decodeURIComponent(query.name)] : []
+      this.selectedSteels = ids.map((id, i) => {
+        const steel = getSteelById(id)
+        if (steel && names[i]) steel.name = names[i]
+        return steel
+      }).filter(Boolean)
     }
   },
   methods: {
@@ -147,9 +156,22 @@ export default {
   padding: 20rpx;
 }
 
-.mode-label {
-  color: #FFFFFF;
-  font-size: 32rpx;
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 24rpx;
+}
+
+.mode-tab {
+  color: #666;
+  font-size: 28rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 20rpx;
+}
+
+.mode-tab.active {
+  color: #fff;
+  background-color: #333;
   font-weight: bold;
 }
 
