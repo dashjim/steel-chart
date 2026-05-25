@@ -37,6 +37,7 @@ export function search(keyword) {
   ensureNames()
 
   const kw = keyword.trim().toLowerCase()
+  const steels = getAllSteels()
   const nameMap = new Map()
 
   for (const entry of allNames) {
@@ -45,8 +46,23 @@ export function search(keyword) {
     const key = entry.nameLower
     const existing = nameMap.get(key)
 
-    if (!existing || (entry.isPrimary && !existing.isPrimary)) {
+    if (!existing) {
       nameMap.set(key, entry)
+    } else {
+      // 优先选：1) 主名称就是这个名称的 2) 主名称包含搜索词的
+      const newSteel = steels.find(s => s.id === entry.id)
+      const oldSteel = steels.find(s => s.id === existing.id)
+      const newPrimaryMatch = newSteel && newSteel.name.toLowerCase() === key
+      const oldPrimaryMatch = oldSteel && oldSteel.name.toLowerCase() === key
+      if (newPrimaryMatch && !oldPrimaryMatch) {
+        nameMap.set(key, entry)
+      } else if (!oldPrimaryMatch && !newPrimaryMatch) {
+        const newPrimaryContains = newSteel && newSteel.name.toLowerCase().includes(kw)
+        const oldPrimaryContains = oldSteel && oldSteel.name.toLowerCase().includes(kw)
+        if (newPrimaryContains && !oldPrimaryContains) {
+          nameMap.set(key, entry)
+        }
+      }
     }
   }
 
