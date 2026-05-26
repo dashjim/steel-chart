@@ -113,17 +113,28 @@ export default {
     parseDescription(desc) {
       if (!desc) return []
       const allSteels = getAllSteels()
-      // 收集所有名称（主名称+别名），长度>=3，按长度降序（优先匹配长名称）
-      const names = []
+      // 收集所有名称，同名称优先选主名称匹配的钢材
+      const nameMap = new Map()
       for (const s of allSteels) {
         if (s.id === parseInt(this.id)) continue
-        if (s.name.length >= 3) names.push({ name: s.name, id: s.id })
+        if (s.name.length >= 3) {
+          const key = s.name.toLowerCase()
+          if (!nameMap.has(key)) nameMap.set(key, { name: s.name, id: s.id, isPrimary: true })
+        }
         if (s.aliases) {
           for (const a of s.aliases) {
-            if (a.length >= 3) names.push({ name: a, id: s.id })
+            if (a.length < 3) continue
+            const key = a.toLowerCase()
+            const existing = nameMap.get(key)
+            if (!existing) {
+              nameMap.set(key, { name: a, id: s.id, isPrimary: false })
+            } else if (!existing.isPrimary && s.name.toLowerCase().includes(key)) {
+              nameMap.set(key, { name: a, id: s.id, isPrimary: false })
+            }
           }
         }
       }
+      const names = [...nameMap.values()]
       names.sort((a, b) => b.name.length - a.name.length)
 
       // 标记描述中所有匹配位置
@@ -268,6 +279,7 @@ export default {
 .desc-link {
   color: #FFA500;
   text-decoration: underline;
+  display: inline;
 }
 
 .aliases-list {
