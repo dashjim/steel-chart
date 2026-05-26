@@ -119,13 +119,13 @@ export default {
       const nameMap = new Map()
       for (const s of allSteels) {
         if (s.id === parseInt(this.id)) continue
-        if (s.name.length >= 2) {
+        if (s.name.length >= 3) {
           const key = s.name.toLowerCase()
           if (!nameMap.has(key)) nameMap.set(key, { name: s.name, id: s.id, isPrimary: true })
         }
         if (s.aliases) {
           for (const a of s.aliases) {
-            if (a.length < 2) continue
+            if (a.length < 3) continue
             const key = a.toLowerCase()
             const existing = nameMap.get(key)
             if (!existing) {
