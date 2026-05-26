@@ -83,6 +83,9 @@ export default {
       aliasList: []
     }
   },
+  onShareAppMessage() {
+    return { title: this.steelName + ' - 钢材成分', path: '/pages/sub/detail/detail?id=' + this.id + '&name=' + encodeURIComponent(this.steelName) }
+  },
   onLoad(options) {
     this.id = options.id
     const steel = getSteelById(this.id)

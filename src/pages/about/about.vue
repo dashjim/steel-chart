@@ -13,7 +13,11 @@
 </template>
 
 <script>
-export default {}
+export default {
+  onShareAppMessage() {
+    return { title: "钢材成分图表 - 1451种刀具钢材数据库", path: "/pages/index/index" }
+  }
+}
 </script>
 
 <style scoped>

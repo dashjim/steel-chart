@@ -19,6 +19,9 @@ export default {
       list: [],
     }
   },
+  onShareAppMessage() {
+    return { title: "我的钢材收藏", path: "/pages/index/index" }
+  },
   onShow() {
     this.list = getFavorites().slice().reverse()
   },

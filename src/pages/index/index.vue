@@ -69,6 +69,9 @@ export default {
     this.allSteels = getAllSteels()
     this.refreshFavorites()
   },
+  onShareAppMessage() {
+    return { title: '钢材成分图表 - 刀具钢材数据库', path: '/pages/index/index' }
+  },
   methods: {
     onInput(e) {
       const val = e.detail.value

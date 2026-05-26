@@ -34,6 +34,9 @@ export default {
       elementsList: []
     }
   },
+  onShareAppMessage() {
+    return { title: "元素成分", path: "/pages/index/index" }
+  },
   onLoad(query) {
     if (query && query.id) {
       const steel = getSteelById(query.id)

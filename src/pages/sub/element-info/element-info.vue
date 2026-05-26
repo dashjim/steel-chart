@@ -30,6 +30,9 @@ export default {
       description: '',
     }
   },
+  onShareAppMessage() {
+    return { title: "元素说明", path: "/pages/index/index" }
+  },
   onLoad(options) {
     const symbol = options.element || ''
     const info = elementData[symbol]

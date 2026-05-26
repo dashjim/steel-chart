@@ -75,6 +75,9 @@ export default {
       return [...elSet]
     }
   },
+  onShareAppMessage() {
+    return { title: "钢材成分图表", path: "/pages/index/index" }
+  },
   onLoad(query) {
     if (query && query.ids) {
       const ids = query.ids.split(',').map(Number)
