@@ -30,12 +30,14 @@
 
     <view class="section" v-if="descParts.length">
       <text class="section-label">Notes:</text>
-      <view class="description-text">
-        <template v-for="(part, idx) in descParts">
-          <text v-if="part.type === 'text'" :key="'t'+idx" user-select>{{ part.value }}</text>
-          <text v-else :key="'l'+idx" class="desc-link" @click="goSteelByName(part.id, part.value)">{{ part.value }}</text>
-        </template>
-      </view>
+      <text class="description-text" user-select>
+        <text
+          v-for="(part, idx) in descParts"
+          :key="idx"
+          :class="part.type === 'link' ? 'desc-link' : ''"
+          @click="part.type === 'link' && goSteelByName(part.id, part.value)"
+        >{{ part.value }}</text>
+      </text>
     </view>
 
     <view class="section" v-if="aliasList.length">
@@ -117,13 +119,13 @@ export default {
       const nameMap = new Map()
       for (const s of allSteels) {
         if (s.id === parseInt(this.id)) continue
-        if (s.name.length >= 3) {
+        if (s.name.length >= 2) {
           const key = s.name.toLowerCase()
           if (!nameMap.has(key)) nameMap.set(key, { name: s.name, id: s.id, isPrimary: true })
         }
         if (s.aliases) {
           for (const a of s.aliases) {
-            if (a.length < 3) continue
+            if (a.length < 2) continue
             const key = a.toLowerCase()
             const existing = nameMap.get(key)
             if (!existing) {
@@ -278,8 +280,6 @@ export default {
 
 .desc-link {
   color: #FFA500;
-  text-decoration: underline;
-  display: inline;
 }
 
 .aliases-list {
