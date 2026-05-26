@@ -22,6 +22,9 @@ export default {
   onShareAppMessage() {
     return { title: "我的钢材收藏", path: "/pages/index/index" }
   },
+  onShareTimeline() {
+    return {}
+  },
   onShow() {
     this.list = getFavorites().slice().reverse()
   },

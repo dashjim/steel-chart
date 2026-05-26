@@ -72,6 +72,9 @@ export default {
   onShareAppMessage() {
     return { title: '钢材成分图表 - 刀具钢材数据库', path: '/pages/index/index' }
   },
+  onShareTimeline() {
+    return {}
+  },
   methods: {
     onInput(e) {
       const val = e.detail.value

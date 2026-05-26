@@ -1,3 +1,4 @@
+
 <template>
   <view class="page">
     <view class="app-name">钢材成分图表</view>
@@ -16,6 +17,9 @@
 export default {
   onShareAppMessage() {
     return { title: "钢材成分图表 - 1451种刀具钢材数据库", path: "/pages/index/index" }
+  },
+  onShareTimeline() {
+    return {}
   }
 }
 </script>

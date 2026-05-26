@@ -1,3 +1,4 @@
+
 <template>
   <view class="page">
     <view class="header">{{ fullName }}</view>
@@ -32,6 +33,9 @@ export default {
   },
   onShareAppMessage() {
     return { title: "元素说明", path: "/pages/index/index" }
+  },
+  onShareTimeline() {
+    return {}
   },
   onLoad(options) {
     const symbol = options.element || ''

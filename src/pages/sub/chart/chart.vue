@@ -1,3 +1,4 @@
+
 <template>
   <view class="chart-page">
     <view class="header">
@@ -77,6 +78,9 @@ export default {
   },
   onShareAppMessage() {
     return { title: "钢材成分图表", path: "/pages/index/index" }
+  },
+  onShareTimeline() {
+    return {}
   },
   onLoad(query) {
     if (query && query.ids) {

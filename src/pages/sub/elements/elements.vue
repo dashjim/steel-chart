@@ -1,3 +1,4 @@
+
 <template>
   <view class="page">
     <view class="header">
@@ -36,6 +37,9 @@ export default {
   },
   onShareAppMessage() {
     return { title: "元素成分", path: "/pages/index/index" }
+  },
+  onShareTimeline() {
+    return {}
   },
   onLoad(query) {
     if (query && query.id) {
