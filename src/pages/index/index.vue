@@ -45,6 +45,7 @@
 import { getAllSteels } from '@/utils/data'
 import { search, fuzzySearch } from '@/utils/search'
 import { getFavorites, toggleFavorite } from '@/utils/favorites'
+import larrinRatings from '@/data/larrin-ratings.json'
 
 export default {
   data() {
@@ -66,12 +67,13 @@ export default {
     this.refreshFavorites()
   },
   onLoad() {
-    const larrinNames = require('@/data/larrin-ratings.json').map(r => r.name.toLowerCase())
+    const larrinNames = larrinRatings.map(r => r.name.toLowerCase())
     const all = getAllSteels()
     const larrin = []
     const rest = []
     for (const s of all) {
-      const isLarrin = larrinNames.some(ln => ln === s.name.toLowerCase() || ln.includes(s.name.toLowerCase()) || (s.aliases && s.aliases.some(a => ln.includes(a.toLowerCase()))))
+      const nameLower = s.name.toLowerCase()
+      const isLarrin = larrinNames.some(ln => ln === nameLower || ln.includes(nameLower)) || (s.aliases && s.aliases.some(a => larrinNames.some(ln => ln.includes(a.toLowerCase()))))
       if (isLarrin) larrin.push(s)
       else rest.push(s)
     }
