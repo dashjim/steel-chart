@@ -30,8 +30,14 @@ export default {
   },
   methods: {
     goDetail(item) {
-      const name = encodeURIComponent(item.displayName || '')
-      uni.navigateTo({ url: `/pages/sub/detail/detail?id=${item.id}&name=${name}` })
+      if (item.compareData) {
+        const ids = item.compareData.ids.join(',')
+        const names = encodeURIComponent(item.compareData.names.join('|'))
+        uni.navigateTo({ url: `/pages/sub/chart/chart?ids=${ids}&names=${names}` })
+      } else {
+        const name = encodeURIComponent(item.displayName || '')
+        uni.navigateTo({ url: `/pages/sub/detail/detail?id=${item.id}&name=${name}` })
+      }
     },
     removeFavorite(item) {
       toggleFavorite(item.id)

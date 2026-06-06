@@ -1,4 +1,3 @@
-
 <template>
   <view class="chart-page">
     <view class="header">
@@ -9,11 +8,7 @@
       </view>
     </view>
 
-    <view
-      class="chart-area"
-      @touchstart="onTouchStart"
-      @touchend="onTouchEnd"
-    >
+    <view class="chart-area">
       <steel-chart
         v-if="selectedSteels.length > 0"
         :steels="selectedSteels"
@@ -27,18 +22,20 @@
     </view>
 
     <view class="legend" v-if="selectedSteels.length > 0">
-      <view v-for="steel in selectedSteels" :key="steel.id" class="legend-item">
+      <view v-for="(steel, idx) in selectedSteels" :key="idx" class="legend-item">
         <text class="legend-name">{{ steel.name }}</text>
-        <text class="legend-comp">{{ formatLegend(steel) }}</text>
+        <text v-if="selectedSteels.length > 1" class="legend-remove" @click="removeSteel(idx)">✕</text>
       </view>
     </view>
 
     <view class="toolbar">
-      <view class="toolbar-btn" @click="zoomIn">
+      <view v-if="selectedSteels.length < 5" class="toolbar-btn" @click="addCompare">
         <text class="toolbar-icon">+</text>
+        <text class="toolbar-label">对比</text>
       </view>
-      <view class="toolbar-btn" @click="zoomOut">
-        <text class="toolbar-icon">-</text>
+      <view class="toolbar-btn" @click="saveCompare">
+        <text class="toolbar-icon">★</text>
+        <text class="toolbar-label">收藏</text>
       </view>
     </view>
   </view>
@@ -47,23 +44,21 @@
 <script>
 import { getSteelById } from '@/utils/data.js'
 import { getMinMax } from '@/utils/composition.js'
+import { toggleFavorite } from '@/utils/favorites.js'
 
 const MODES = ['mass', 'atoms', 'molar']
-const MODE_LABELS = { mass: 'Mass %', atoms: 'Atoms', molar: 'Molar %' }
 
 export default {
   data() {
     return {
       selectedSteels: [],
+      steelIds: [],
+      steelNames: [],
       mode: 'mass',
-      yMax: 0,
-      touchStartX: 0
+      yMax: 0
     }
   },
   computed: {
-    modeLabel() {
-      return MODE_LABELS[this.mode] || 'Mass %'
-    },
     steelElements() {
       const elSet = new Set()
       for (const steel of this.selectedSteels) {
@@ -77,36 +72,72 @@ export default {
     }
   },
   onShareAppMessage() {
-    return { title: "钢材成分图表", path: "/pages/index/index" }
+    const names = this.steelNames.join(' / ')
+    return { title: names + ' - 成分对比', path: '/pages/sub/chart/chart?ids=' + this.steelIds.join(',') + '&names=' + encodeURIComponent(this.steelNames.join('|')) }
   },
   onShareTimeline() {
     return {}
   },
   onLoad(query) {
     if (query && query.ids) {
-      const ids = query.ids.split(',').map(Number)
-      const names = query.name ? [decodeURIComponent(query.name)] : []
-      this.selectedSteels = ids.map((id, i) => {
-        const steel = getSteelById(id)
-        if (steel && names[i]) steel.name = names[i]
-        return steel
-      }).filter(Boolean)
+      this.steelIds = query.ids.split(',').map(Number)
+      if (query.names) {
+        this.steelNames = decodeURIComponent(query.names).split('|')
+      } else if (query.name) {
+        this.steelNames = [decodeURIComponent(query.name)]
+      }
+      this.loadSteels()
+    }
+  },
+  onShow() {
+    // 从搜索页返回时检查是否有新增钢材
+    const pages = getCurrentPages()
+    const currentPage = pages[pages.length - 1]
+    if (currentPage && currentPage.addedSteelId) {
+      const id = currentPage.addedSteelId
+      const name = currentPage.addedSteelName || ''
+      delete currentPage.addedSteelId
+      delete currentPage.addedSteelName
+      if (!this.steelIds.includes(id)) {
+        this.steelIds.push(id)
+        this.steelNames.push(name)
+        this.loadSteels()
+      }
     }
   },
   methods: {
-    zoomIn() {
-      if (this.yMax <= 0) {
-        this.yMax = this.computeAutoMax() * 0.7
-      } else {
-        this.yMax = Math.max(0.05, this.yMax * 0.7)
-      }
+    loadSteels() {
+      this.selectedSteels = this.steelIds.map((id, i) => {
+        const steel = getSteelById(id)
+        if (steel && this.steelNames[i]) steel.name = this.steelNames[i]
+        return steel
+      }).filter(Boolean)
+      this.yMax = 0
     },
-    zoomOut() {
-      if (this.yMax <= 0) {
-        this.yMax = this.computeAutoMax() * 1.5
-      } else {
-        this.yMax = this.yMax * 1.5
+    removeSteel(idx) {
+      this.steelIds.splice(idx, 1)
+      this.steelNames.splice(idx, 1)
+      this.loadSteels()
+    },
+    addCompare() {
+      if (this.selectedSteels.length >= 5) {
+        uni.showToast({ title: '最多对比5种', icon: 'none' })
+        return
       }
+      uni.navigateTo({
+        url: '/pages/sub/chart/select-steel?from=chart&ids=' + this.steelIds.join(',') + '&names=' + encodeURIComponent(this.steelNames.join('|'))
+      })
+    },
+    saveCompare() {
+      if (this.selectedSteels.length === 0) return
+      const displayName = this.steelNames.join(' / ')
+      const compareData = {
+        type: 'compare',
+        ids: this.steelIds.slice(),
+        names: this.steelNames.slice()
+      }
+      toggleFavorite('compare_' + this.steelIds.join('_'), displayName, compareData)
+      uni.showToast({ title: '已收藏对比', icon: 'success' })
     },
     computeAutoMax() {
       let max = 0
@@ -118,33 +149,6 @@ export default {
         }
       }
       return max || 1
-    },
-    onTouchStart(e) {
-      if (e.touches && e.touches.length > 0) {
-        this.touchStartX = e.touches[0].clientX
-      }
-    },
-    onTouchEnd(e) {
-      if (e.changedTouches && e.changedTouches.length > 0) {
-        const dx = e.changedTouches[0].clientX - this.touchStartX
-        if (Math.abs(dx) > 50) {
-          const idx = MODES.indexOf(this.mode)
-          if (dx < 0) {
-            this.mode = MODES[(idx + 1) % MODES.length]
-          } else {
-            this.mode = MODES[(idx - 1 + MODES.length) % MODES.length]
-          }
-        }
-      }
-    },
-    formatLegend(steel) {
-      if (!steel.composition) return ''
-      const parts = []
-      for (const [el, vals] of Object.entries(steel.composition)) {
-        if (vals.length === 2) parts.push(`${el}:${vals[0]}-${vals[1]}`)
-        else parts.push(`${el}:${vals[0]}`)
-      }
-      return parts.join(' ')
     }
   }
 }
@@ -207,26 +211,29 @@ export default {
 }
 
 .legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 8rpx;
 }
 
 .legend-name {
   color: #4A90D9;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: bold;
-  margin-right: 16rpx;
 }
 
-.legend-comp {
-  color: #999;
-  font-size: 22rpx;
+.legend-remove {
+  color: #ff4444;
+  font-size: 28rpx;
+  padding: 8rpx 16rpx;
 }
 
 .toolbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 80rpx;
+  gap: 60rpx;
   padding: 20rpx 0;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   background-color: #111111;
@@ -234,17 +241,20 @@ export default {
 }
 
 .toolbar-btn {
-  width: 72rpx;
-  height: 72rpx;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  border: 1rpx solid #555;
-  border-radius: 50%;
+  padding: 10rpx 30rpx;
 }
 
 .toolbar-icon {
   color: #FFFFFF;
-  font-size: 40rpx;
+  font-size: 36rpx;
+}
+
+.toolbar-label {
+  color: #999;
+  font-size: 22rpx;
+  margin-top: 4rpx;
 }
 </style>

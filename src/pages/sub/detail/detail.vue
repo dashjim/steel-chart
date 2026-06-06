@@ -55,7 +55,7 @@
     <view class="action-bar">
       <view class="action-btn" @click="goChart">
         <text class="action-icon">📊</text>
-        <text class="action-label">查看图表</text>
+        <text class="action-label">查看图表和对比</text>
       </view>
     </view>
   </view>

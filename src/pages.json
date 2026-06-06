@@ -44,7 +44,16 @@
 				{
 					"path": "chart/chart",
 					"style": {
-						"navigationBarTitleText": "成分图表",
+						"navigationBarTitleText": "成分对比",
+						"navigationBarBackgroundColor": "#000000",
+						"navigationBarTextStyle": "white",
+						"backgroundColor": "#000000"
+					}
+				},
+				{
+					"path": "chart/select-steel",
+					"style": {
+						"navigationBarTitleText": "选择对比钢材",
 						"navigationBarBackgroundColor": "#000000",
 						"navigationBarTextStyle": "white",
 						"backgroundColor": "#000000"
