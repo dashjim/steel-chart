@@ -11,8 +11,8 @@
 <script>
 import { getMinMax, toAtoms, toMolar } from '../../utils/composition.js'
 
-const COLORS = ['#4A90D9', '#E67E22', '#27AE60', '#E74C3C']
-const COLORS_LIGHT = ['#7AB3E8', '#F0A860', '#5DC888', '#F08070']
+const COLORS = ['#4A90D9', '#E67E22', '#27AE60', '#E74C3C', '#9B59B6']
+const COLORS_LIGHT = ['#7AB3E8', '#F0A860', '#5DC888', '#F08070', '#C39BD3']
 
 export default {
   name: 'SteelChart',

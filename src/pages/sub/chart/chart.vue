@@ -241,7 +241,7 @@ export default {
 }
 
 .legend-name {
-  color: #4A90D9;
+  color: #FFD700;
   font-size: 28rpx;
   font-weight: bold;
   display: block;
@@ -258,6 +258,7 @@ export default {
   color: #ff4444;
   font-size: 28rpx;
   padding: 8rpx 16rpx;
+  flex-shrink: 0;
 }
 
 .toolbar {
