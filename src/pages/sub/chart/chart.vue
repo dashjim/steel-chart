@@ -21,12 +21,15 @@
       </view>
     </view>
 
-    <view class="legend" v-if="selectedSteels.length > 0">
-      <view v-for="(steel, idx) in selectedSteels" :key="idx" class="legend-item">
-        <text class="legend-name">{{ steel.name }}</text>
-        <text v-if="selectedSteels.length > 1" class="legend-remove" @click="removeSteel(idx)">✕</text>
+    <scroll-view class="legend" scroll-y v-if="selectedSteels.length > 0">
+      <view v-for="(steel, idx) in selectedSteels" :key="idx" class="legend-item" @click="goDetail(idx)">
+        <view class="legend-left">
+          <text class="legend-name">{{ steel.name }}</text>
+          <text class="legend-comp">{{ formatComp(steel) }}</text>
+        </view>
+        <text v-if="selectedSteels.length > 1" class="legend-remove" @click.stop="removeSteel(idx)">✕</text>
       </view>
-    </view>
+    </scroll-view>
 
     <view class="toolbar">
       <view v-if="selectedSteels.length < 5" class="toolbar-btn" @click="addCompare">
@@ -139,6 +142,20 @@ export default {
       toggleFavorite('compare_' + this.steelIds.join('_'), displayName, compareData)
       uni.showToast({ title: '已收藏对比', icon: 'success' })
     },
+    goDetail(idx) {
+      const id = this.steelIds[idx]
+      const name = this.steelNames[idx] || ''
+      uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + id + '&name=' + encodeURIComponent(name) })
+    },
+    formatComp(steel) {
+      if (!steel.composition) return ''
+      const parts = []
+      for (const [el, vals] of Object.entries(steel.composition)) {
+        const v = vals.length === 2 ? vals[1] : vals[0]
+        parts.push(el + ':' + v)
+      }
+      return parts.join(' ')
+    },
     computeAutoMax() {
       let max = 0
       for (const steel of this.selectedSteels) {
@@ -205,6 +222,7 @@ export default {
 }
 
 .legend {
+  max-height: 400rpx;
   padding: 16rpx 30rpx;
   background-color: #111111;
   border-top: 1rpx solid #333333;
@@ -214,13 +232,26 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #222;
+}
+
+.legend-left {
+  flex: 1;
 }
 
 .legend-name {
   color: #4A90D9;
   font-size: 28rpx;
   font-weight: bold;
+  display: block;
+}
+
+.legend-comp {
+  color: #666;
+  font-size: 22rpx;
+  display: block;
+  margin-top: 4rpx;
 }
 
 .legend-remove {
