@@ -38,7 +38,7 @@
         </view>
       </view>
       <view class="rating-group">
-        <text class="rating-source">{{ ratings.larrin ? '成分估算' : '成分估算 (无实测数据)' }}</text>
+        <text class="rating-source">{{ ratings.larrin ? '性能估算' : '性能估算 (无实测数据)' }}</text>
         <view class="rating-row">
           <view class="rating-item">
             <text class="rating-label">韧性</text>
