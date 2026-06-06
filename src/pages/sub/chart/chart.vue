@@ -133,13 +133,20 @@ export default {
     },
     saveCompare() {
       if (this.selectedSteels.length === 0) return
+      const favId = 'compare_' + this.steelIds.sort((a, b) => a - b).join('_')
+      const favs = uni.getStorageSync('favorites') || []
+      if (favs.some(f => f.id === favId)) {
+        uni.showToast({ title: '已在收藏中', icon: 'none' })
+        return
+      }
       const displayName = this.steelNames.join(' / ')
       const compareData = {
         type: 'compare',
         ids: this.steelIds.slice(),
         names: this.steelNames.slice()
       }
-      toggleFavorite('compare_' + this.steelIds.join('_'), displayName, compareData)
+      favs.push({ id: favId, displayName, compareData })
+      uni.setStorageSync('favorites', favs)
       uni.showToast({ title: '已收藏对比', icon: 'success' })
     },
     goDetail(idx) {
