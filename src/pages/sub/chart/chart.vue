@@ -33,11 +33,11 @@
 
     <view class="toolbar">
       <view v-if="selectedSteels.length < 5" class="toolbar-btn" @click="addCompare">
-        <text class="toolbar-icon">+</text>
+        <text class="toolbar-icon add-icon">+</text>
         <text class="toolbar-label">对比</text>
       </view>
       <view class="toolbar-btn" @click="saveCompare">
-        <text class="toolbar-icon">★</text>
+        <text class="toolbar-icon fav-icon">★</text>
         <text class="toolbar-label">收藏</text>
       </view>
     </view>
@@ -282,6 +282,19 @@ export default {
 .toolbar-icon {
   color: #FFFFFF;
   font-size: 36rpx;
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+}
+
+.add-icon {
+  font-size: 44rpx;
+}
+
+.fav-icon {
+  font-size: 36rpx;
+  color: #FFD700;
 }
 
 .toolbar-label {
