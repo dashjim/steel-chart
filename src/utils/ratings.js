@@ -71,7 +71,9 @@ export function getRatings(steel) {
       comp[el] = vals.length === 2 ? (vals[0] + vals[1]) / 2 : vals[0]
     }
   }
-  comp.isPM = (steel.tech === 'PM' || steel.tech === 'CPM') ? 1 : 0
+  const tech = (steel.tech || '').toUpperCase()
+  const nameUpper = (steel.name || '').toUpperCase()
+  comp.isPM = (tech === 'PM' || tech === 'CPM' || tech === 'MM' || nameUpper.includes('CPM') || nameUpper.includes('MICRO-MELT')) ? 1 : 0
 
   const features = computeFeatures(comp)
   const estimated = {

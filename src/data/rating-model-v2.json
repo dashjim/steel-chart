@@ -1,1 +1,1228 @@
-{"features":["C","Cr","Mo","V","W","Co","Nb","N","isPM","V_x_C","W_x_C","Cr_x_C","Cr_minus_C_x_4","Cr_minus_carbide_C","total_carbide_vol","C_squared","V_squared","Cr_x_Mo","V_x_isPM","C_x_isPM","Cr_x_N","Mo_x_N","intercept"],"models":{"toughness":{"coefficients":{"C":0.0019,"Cr":-1.131,"Mo":0.5696,"V":-1.0034,"W":-1.1496,"Co":-0.0504,"Nb":-0.3262,"N":10.8802,"isPM":1.4659,"V_x_C":-0.2244,"W_x_C":0.3112,"Cr_x_C":0.1392,"Cr_minus_C_x_4":-1.1385,"Cr_minus_carbide_C":1.9991,"total_carbide_vol":-0.8248,"C_squared":-0.0745,"V_squared":0.0758,"Cr_x_Mo":-0.086,"V_x_isPM":-0.5316,"C_x_isPM":1.3222,"Cr_x_N":-0.183,"Mo_x_N":-6.0179,"intercept":12.2769}},"edgeRetention":{"coefficients":{"C":0.2662,"Cr":0.2849,"Mo":-0.0185,"V":-0.1564,"W":-0.1587,"Co":0.0844,"Nb":-0.6696,"N":0.6762,"isPM":0.2615,"V_x_C":-0.3959,"W_x_C":0.1409,"Cr_x_C":0.0012,"Cr_minus_C_x_4":-0.7798,"Cr_minus_carbide_C":0.6199,"total_carbide_vol":0.3546,"C_squared":0.0696,"V_squared":0.0566,"Cr_x_Mo":0.0105,"V_x_isPM":0.1506,"C_x_isPM":-0.4283,"Cr_x_N":0.0206,"Mo_x_N":-0.6416,"intercept":0.0446}},"corrosion":{"coefficients":{"C":0.2229,"Cr":-0.0107,"Mo":0.0819,"V":-1.2306,"W":-0.0817,"Co":-0.0247,"Nb":0.0991,"N":6.4849,"isPM":0.9839,"V_x_C":-0.0963,"W_x_C":-0.0577,"Cr_x_C":-0.0971,"Cr_minus_C_x_4":-0.9023,"Cr_minus_carbide_C":1.5112,"total_carbide_vol":-0.0447,"C_squared":0.596,"V_squared":0.0063,"Cr_x_Mo":-0.0022,"V_x_isPM":0.3592,"C_x_isPM":-0.7207,"Cr_x_N":-0.3866,"Mo_x_N":0.1231,"intercept":1.4667}}}}
+{
+  "version": 2,
+  "description": "Enhanced linear regression with metallurgical cross features and confidence intervals",
+  "features": [
+    "C",
+    "Cr",
+    "Mo",
+    "V",
+    "W",
+    "Co",
+    "Nb",
+    "N",
+    "isPM",
+    "V_x_C",
+    "W_x_C",
+    "Cr_x_C",
+    "Cr_minus_C_x_4",
+    "Cr_minus_carbide_C",
+    "total_carbide_vol",
+    "C_squared",
+    "V_squared",
+    "Cr_x_Mo",
+    "V_x_isPM",
+    "C_x_isPM",
+    "Cr_x_N",
+    "Mo_x_N",
+    "intercept"
+  ],
+  "featureFormulas": {
+    "C": "C",
+    "Cr": "Cr",
+    "Mo": "Mo",
+    "V": "V",
+    "W": "W",
+    "Co": "Co",
+    "Nb": "Nb",
+    "N": "N",
+    "isPM": "isPM (1 if PM/CPM/MM, else 0)",
+    "V_x_C": "V * C",
+    "W_x_C": "W * C",
+    "Cr_x_C": "Cr * C",
+    "Cr_minus_C_x_4": "Cr - C * 4",
+    "Cr_minus_carbide_C": "Cr - max(0, C - V*0.24 - Nb*0.13 - W*0.06) * 4",
+    "total_carbide_vol": "C*2.5 + V*0.5 + W*0.2 + Nb*0.3",
+    "C_squared": "C^2",
+    "V_squared": "V^2",
+    "Cr_x_Mo": "Cr * Mo",
+    "V_x_isPM": "V * isPM",
+    "C_x_isPM": "C * isPM",
+    "Cr_x_N": "Cr * N",
+    "Mo_x_N": "Mo * N",
+    "intercept": "1 (constant)"
+  },
+  "models": {
+    "toughness": {
+      "coefficients": {
+        "C": 0.0019,
+        "Cr": -1.131,
+        "Mo": 0.5696,
+        "V": -1.0034,
+        "W": -1.1496,
+        "Co": -0.0504,
+        "Nb": -0.3262,
+        "N": 10.8802,
+        "isPM": 1.4659,
+        "V_x_C": -0.2244,
+        "W_x_C": 0.3112,
+        "Cr_x_C": 0.1392,
+        "Cr_minus_C_x_4": -1.1385,
+        "Cr_minus_carbide_C": 1.9991,
+        "total_carbide_vol": -0.8248,
+        "C_squared": -0.0745,
+        "V_squared": 0.0758,
+        "Cr_x_Mo": -0.086,
+        "V_x_isPM": -0.5316,
+        "C_x_isPM": 1.3222,
+        "Cr_x_N": -0.183,
+        "Mo_x_N": -6.0179,
+        "intercept": 12.2769
+      },
+      "r2": 0.762,
+      "rmse": 1.1173,
+      "stdError": 1.4228
+    },
+    "edgeRetention": {
+      "coefficients": {
+        "C": 0.2662,
+        "Cr": 0.2849,
+        "Mo": -0.0185,
+        "V": -0.1564,
+        "W": -0.1587,
+        "Co": 0.0844,
+        "Nb": -0.6696,
+        "N": 0.6762,
+        "isPM": 0.2615,
+        "V_x_C": -0.3959,
+        "W_x_C": 0.1409,
+        "Cr_x_C": 0.0012,
+        "Cr_minus_C_x_4": -0.7798,
+        "Cr_minus_carbide_C": 0.6199,
+        "total_carbide_vol": 0.3546,
+        "C_squared": 0.0696,
+        "V_squared": 0.0566,
+        "Cr_x_Mo": 0.0105,
+        "V_x_isPM": 0.1506,
+        "C_x_isPM": -0.4283,
+        "Cr_x_N": 0.0206,
+        "Mo_x_N": -0.6416,
+        "intercept": 0.0446
+      },
+      "r2": 0.9843,
+      "rmse": 0.3302,
+      "stdError": 0.4205
+    },
+    "corrosion": {
+      "coefficients": {
+        "C": 0.2229,
+        "Cr": -0.0107,
+        "Mo": 0.0819,
+        "V": -1.2306,
+        "W": -0.0817,
+        "Co": -0.0247,
+        "Nb": 0.0991,
+        "N": 6.4849,
+        "isPM": 0.9839,
+        "V_x_C": -0.0963,
+        "W_x_C": -0.0577,
+        "Cr_x_C": -0.0971,
+        "Cr_minus_C_x_4": -0.9023,
+        "Cr_minus_carbide_C": 1.5112,
+        "total_carbide_vol": -0.0447,
+        "C_squared": 0.596,
+        "V_squared": 0.0063,
+        "Cr_x_Mo": -0.0022,
+        "V_x_isPM": 0.3592,
+        "C_x_isPM": -0.7207,
+        "Cr_x_N": -0.3866,
+        "Mo_x_N": 0.1231,
+        "intercept": 1.4667
+      },
+      "r2": 0.9898,
+      "rmse": 0.3259,
+      "stdError": 0.415
+    }
+  },
+  "predictions": [
+    {
+      "name": "8670",
+      "actual": {
+        "toughness": 10,
+        "edgeRetention": 1.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 8.41,
+        "edgeRetention": 1.37,
+        "corrosion": 0.36
+      },
+      "confidence95": {
+        "toughness": 3.1,
+        "edgeRetention": 0.92,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "5160",
+      "actual": {
+        "toughness": 9.5,
+        "edgeRetention": 1.5,
+        "corrosion": 0.5
+      },
+      "predicted": {
+        "toughness": 8.8,
+        "edgeRetention": 1.25,
+        "corrosion": 0.72
+      },
+      "confidence95": {
+        "toughness": 3.13,
+        "edgeRetention": 0.93,
+        "corrosion": 0.91
+      }
+    },
+    {
+      "name": "52100",
+      "actual": {
+        "toughness": 8.5,
+        "edgeRetention": 2,
+        "corrosion": 0.5
+      },
+      "predicted": {
+        "toughness": 6.29,
+        "edgeRetention": 2.17,
+        "corrosion": 0.41
+      },
+      "confidence95": {
+        "toughness": 3.01,
+        "edgeRetention": 0.89,
+        "corrosion": 0.88
+      }
+    },
+    {
+      "name": "1084",
+      "actual": {
+        "toughness": 8,
+        "edgeRetention": 1.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 7.46,
+        "edgeRetention": 1.65,
+        "corrosion": -0.1
+      },
+      "confidence95": {
+        "toughness": 3.05,
+        "edgeRetention": 0.9,
+        "corrosion": 0.89
+      }
+    },
+    {
+      "name": "80CrV2",
+      "actual": {
+        "toughness": 8,
+        "edgeRetention": 1.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 7.87,
+        "edgeRetention": 1.65,
+        "corrosion": 0.28
+      },
+      "confidence95": {
+        "toughness": 3.08,
+        "edgeRetention": 0.91,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "L6",
+      "actual": {
+        "toughness": 8,
+        "edgeRetention": 1.5,
+        "corrosion": 0.5
+      },
+      "predicted": {
+        "toughness": 9.3,
+        "edgeRetention": 1.09,
+        "corrosion": 1.03
+      },
+      "confidence95": {
+        "toughness": 3.19,
+        "edgeRetention": 0.94,
+        "corrosion": 0.93
+      }
+    },
+    {
+      "name": "ApexUltra",
+      "actual": {
+        "toughness": 5.5,
+        "edgeRetention": 4,
+        "corrosion": 0.5
+      },
+      "predicted": {
+        "toughness": 4.08,
+        "edgeRetention": 3.26,
+        "corrosion": 0.76
+      },
+      "confidence95": {
+        "toughness": 3.1,
+        "edgeRetention": 0.92,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "26C3",
+      "actual": {
+        "toughness": 6,
+        "edgeRetention": 2,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 5.22,
+        "edgeRetention": 2.44,
+        "corrosion": -0.37
+      },
+      "confidence95": {
+        "toughness": 3.07,
+        "edgeRetention": 0.91,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "V-Toku2",
+      "actual": {
+        "toughness": 5.5,
+        "edgeRetention": 2,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 5.77,
+        "edgeRetention": 2.33,
+        "corrosion": 0.13
+      },
+      "confidence95": {
+        "toughness": 3.01,
+        "edgeRetention": 0.89,
+        "corrosion": 0.88
+      }
+    },
+    {
+      "name": "1.2442",
+      "actual": {
+        "toughness": 4.5,
+        "edgeRetention": 2.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 4.9,
+        "edgeRetention": 2.66,
+        "corrosion": 0.08
+      },
+      "confidence95": {
+        "toughness": 3.09,
+        "edgeRetention": 0.91,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "O1",
+      "actual": {
+        "toughness": 4.5,
+        "edgeRetention": 2,
+        "corrosion": 0.5
+      },
+      "predicted": {
+        "toughness": 6.61,
+        "edgeRetention": 2.03,
+        "corrosion": 0.24
+      },
+      "confidence95": {
+        "toughness": 3,
+        "edgeRetention": 0.89,
+        "corrosion": 0.88
+      }
+    },
+    {
+      "name": "1.2519",
+      "actual": {
+        "toughness": 4,
+        "edgeRetention": 2.5,
+        "corrosion": 0.5
+      },
+      "predicted": {
+        "toughness": 5.41,
+        "edgeRetention": 2.57,
+        "corrosion": 0.51
+      },
+      "confidence95": {
+        "toughness": 3,
+        "edgeRetention": 0.89,
+        "corrosion": 0.88
+      }
+    },
+    {
+      "name": "Blue Super",
+      "actual": {
+        "toughness": 2.5,
+        "edgeRetention": 3.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 3.33,
+        "edgeRetention": 3.46,
+        "corrosion": -0.02
+      },
+      "confidence95": {
+        "toughness": 3.2,
+        "edgeRetention": 0.95,
+        "corrosion": 0.93
+      }
+    },
+    {
+      "name": "1.2562",
+      "actual": {
+        "toughness": 2.5,
+        "edgeRetention": 3.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 3.26,
+        "edgeRetention": 3.52,
+        "corrosion": 0.11
+      },
+      "confidence95": {
+        "toughness": 3.23,
+        "edgeRetention": 0.95,
+        "corrosion": 0.94
+      }
+    },
+    {
+      "name": "1095",
+      "actual": {
+        "toughness": 4.5,
+        "edgeRetention": 1.5,
+        "corrosion": 0
+      },
+      "predicted": {
+        "toughness": 6.7,
+        "edgeRetention": 1.91,
+        "corrosion": -0.26
+      },
+      "confidence95": {
+        "toughness": 3.03,
+        "edgeRetention": 0.9,
+        "corrosion": 0.88
+      }
+    },
+    {
+      "name": "10V",
+      "actual": {
+        "toughness": 5,
+        "edgeRetention": 8.5,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 5.15,
+        "edgeRetention": 8.18,
+        "corrosion": 4.28
+      },
+      "confidence95": {
+        "toughness": 3.36,
+        "edgeRetention": 0.99,
+        "corrosion": 0.98
+      }
+    },
+    {
+      "name": "15V",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 10,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 3.51,
+        "edgeRetention": 10.02,
+        "corrosion": 4.33
+      },
+      "confidence95": {
+        "toughness": 3.93,
+        "edgeRetention": 1.16,
+        "corrosion": 1.15
+      }
+    },
+    {
+      "name": "3V",
+      "actual": {
+        "toughness": 9,
+        "edgeRetention": 4.5,
+        "corrosion": 5.5
+      },
+      "predicted": {
+        "toughness": 8.85,
+        "edgeRetention": 4.29,
+        "corrosion": 5.91
+      },
+      "confidence95": {
+        "toughness": 3.48,
+        "edgeRetention": 1.03,
+        "corrosion": 1.01
+      }
+    },
+    {
+      "name": "A2",
+      "actual": {
+        "toughness": 6.5,
+        "edgeRetention": 2.5,
+        "corrosion": 3
+      },
+      "predicted": {
+        "toughness": 6.24,
+        "edgeRetention": 2.65,
+        "corrosion": 2.41
+      },
+      "confidence95": {
+        "toughness": 3.04,
+        "edgeRetention": 0.9,
+        "corrosion": 0.89
+      }
+    },
+    {
+      "name": "CPM-CruWear",
+      "actual": {
+        "toughness": 8,
+        "edgeRetention": 5,
+        "corrosion": 5.5
+      },
+      "predicted": {
+        "toughness": 7.33,
+        "edgeRetention": 4.27,
+        "corrosion": 4.85
+      },
+      "confidence95": {
+        "toughness": 3.09,
+        "edgeRetention": 0.91,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "CPM-M4",
+      "actual": {
+        "toughness": 6.5,
+        "edgeRetention": 6,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 6.24,
+        "edgeRetention": 6.16,
+        "corrosion": 4.4
+      },
+      "confidence95": {
+        "toughness": 3.71,
+        "edgeRetention": 1.1,
+        "corrosion": 1.08
+      }
+    },
+    {
+      "name": "D2",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 5,
+        "corrosion": 4.5
+      },
+      "predicted": {
+        "toughness": 2.83,
+        "edgeRetention": 4.62,
+        "corrosion": 4.65
+      },
+      "confidence95": {
+        "toughness": 3.48,
+        "edgeRetention": 1.03,
+        "corrosion": 1.01
+      }
+    },
+    {
+      "name": "K390",
+      "actual": {
+        "toughness": 5.5,
+        "edgeRetention": 7.5,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 4.79,
+        "edgeRetention": 7.99,
+        "corrosion": 3.81
+      },
+      "confidence95": {
+        "toughness": 3.29,
+        "edgeRetention": 0.97,
+        "corrosion": 0.96
+      }
+    },
+    {
+      "name": "M2",
+      "actual": {
+        "toughness": 5,
+        "edgeRetention": 4,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 5.18,
+        "edgeRetention": 4.27,
+        "corrosion": 3.89
+      },
+      "confidence95": {
+        "toughness": 3.94,
+        "edgeRetention": 1.16,
+        "corrosion": 1.15
+      }
+    },
+    {
+      "name": "Maxamet",
+      "actual": {
+        "toughness": 2,
+        "edgeRetention": 11,
+        "corrosion": 4.5
+      },
+      "predicted": {
+        "toughness": 0.99,
+        "edgeRetention": 11.1,
+        "corrosion": 4.09
+      },
+      "confidence95": {
+        "toughness": 3.85,
+        "edgeRetention": 1.14,
+        "corrosion": 1.12
+      }
+    },
+    {
+      "name": "Rex 121",
+      "actual": {
+        "toughness": 1,
+        "edgeRetention": 12,
+        "corrosion": 3.5
+      },
+      "predicted": {
+        "toughness": 1.71,
+        "edgeRetention": 12.14,
+        "corrosion": 3.71
+      },
+      "confidence95": {
+        "toughness": 4.02,
+        "edgeRetention": 1.19,
+        "corrosion": 1.17
+      }
+    },
+    {
+      "name": "Rex 45/HAP40",
+      "actual": {
+        "toughness": 4.5,
+        "edgeRetention": 6,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 5.52,
+        "edgeRetention": 6.33,
+        "corrosion": 4.16
+      },
+      "confidence95": {
+        "toughness": 3.75,
+        "edgeRetention": 1.11,
+        "corrosion": 1.09
+      }
+    },
+    {
+      "name": "V4E/4V",
+      "actual": {
+        "toughness": 7,
+        "edgeRetention": 5,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 7.81,
+        "edgeRetention": 4.74,
+        "corrosion": 3.71
+      },
+      "confidence95": {
+        "toughness": 3.13,
+        "edgeRetention": 0.93,
+        "corrosion": 0.91
+      }
+    },
+    {
+      "name": "Vanadis 8",
+      "actual": {
+        "toughness": 6,
+        "edgeRetention": 7.5,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 5.03,
+        "edgeRetention": 7.01,
+        "corrosion": 3.74
+      },
+      "confidence95": {
+        "toughness": 3.35,
+        "edgeRetention": 0.99,
+        "corrosion": 0.98
+      }
+    },
+    {
+      "name": "ZDP-189",
+      "actual": {
+        "toughness": 2,
+        "edgeRetention": 8,
+        "corrosion": 5
+      },
+      "predicted": {
+        "toughness": 1.86,
+        "edgeRetention": 8.11,
+        "corrosion": 4.96
+      },
+      "confidence95": {
+        "toughness": 4.09,
+        "edgeRetention": 1.21,
+        "corrosion": 1.19
+      }
+    },
+    {
+      "name": "Z-Max",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 10,
+        "corrosion": 4
+      },
+      "predicted": {
+        "toughness": 3.17,
+        "edgeRetention": 9.41,
+        "corrosion": 4.05
+      },
+      "confidence95": {
+        "toughness": 3.38,
+        "edgeRetention": 1,
+        "corrosion": 0.99
+      }
+    },
+    {
+      "name": "Z-Tuff",
+      "actual": {
+        "toughness": 10,
+        "edgeRetention": 2.5,
+        "corrosion": 5.5
+      },
+      "predicted": {
+        "toughness": 9.22,
+        "edgeRetention": 2.9,
+        "corrosion": 5.22
+      },
+      "confidence95": {
+        "toughness": 3.37,
+        "edgeRetention": 1,
+        "corrosion": 0.98
+      }
+    },
+    {
+      "name": "1.4116",
+      "actual": {
+        "toughness": 2.5,
+        "edgeRetention": 2.5,
+        "corrosion": 8
+      },
+      "predicted": {
+        "toughness": 6.22,
+        "edgeRetention": 2.93,
+        "corrosion": 8.48
+      },
+      "confidence95": {
+        "toughness": 3.2,
+        "edgeRetention": 0.95,
+        "corrosion": 0.93
+      }
+    },
+    {
+      "name": "14C28N",
+      "actual": {
+        "toughness": 9,
+        "edgeRetention": 3,
+        "corrosion": 8.5
+      },
+      "predicted": {
+        "toughness": 7.18,
+        "edgeRetention": 3.05,
+        "corrosion": 7.9
+      },
+      "confidence95": {
+        "toughness": 3.15,
+        "edgeRetention": 0.93,
+        "corrosion": 0.92
+      }
+    },
+    {
+      "name": "154CM",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 4.5,
+        "corrosion": 7
+      },
+      "predicted": {
+        "toughness": 2.14,
+        "edgeRetention": 4.28,
+        "corrosion": 6.84
+      },
+      "confidence95": {
+        "toughness": 3.64,
+        "edgeRetention": 1.08,
+        "corrosion": 1.06
+      }
+    },
+    {
+      "name": "420HC",
+      "actual": {
+        "toughness": 9,
+        "edgeRetention": 2.5,
+        "corrosion": 8
+      },
+      "predicted": {
+        "toughness": 7.17,
+        "edgeRetention": 2.65,
+        "corrosion": 7.77
+      },
+      "confidence95": {
+        "toughness": 3.22,
+        "edgeRetention": 0.95,
+        "corrosion": 0.94
+      }
+    },
+    {
+      "name": "440A",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 3.5,
+        "corrosion": 8.5
+      },
+      "predicted": {
+        "toughness": 6.06,
+        "edgeRetention": 2.93,
+        "corrosion": 7.95
+      },
+      "confidence95": {
+        "toughness": 3.12,
+        "edgeRetention": 0.92,
+        "corrosion": 0.91
+      }
+    },
+    {
+      "name": "440C",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 4.5,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 3.69,
+        "edgeRetention": 4.29,
+        "corrosion": 8.08
+      },
+      "confidence95": {
+        "toughness": 3.19,
+        "edgeRetention": 0.94,
+        "corrosion": 0.93
+      }
+    },
+    {
+      "name": "AEB-L",
+      "actual": {
+        "toughness": 9,
+        "edgeRetention": 3,
+        "corrosion": 7
+      },
+      "predicted": {
+        "toughness": 6.22,
+        "edgeRetention": 2.93,
+        "corrosion": 7.08
+      },
+      "confidence95": {
+        "toughness": 3.07,
+        "edgeRetention": 0.91,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "AUS-8/8Cr13MoV",
+      "actual": {
+        "toughness": 6,
+        "edgeRetention": 3,
+        "corrosion": 7
+      },
+      "predicted": {
+        "toughness": 5.86,
+        "edgeRetention": 3.2,
+        "corrosion": 7.39
+      },
+      "confidence95": {
+        "toughness": 3.04,
+        "edgeRetention": 0.9,
+        "corrosion": 0.89
+      }
+    },
+    {
+      "name": "BD1N",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 3.5,
+        "corrosion": 8.5
+      },
+      "predicted": {
+        "toughness": 5.24,
+        "edgeRetention": 3.84,
+        "corrosion": 8.17
+      },
+      "confidence95": {
+        "toughness": 3.14,
+        "edgeRetention": 0.93,
+        "corrosion": 0.92
+      }
+    },
+    {
+      "name": "CPM-154",
+      "actual": {
+        "toughness": 5,
+        "edgeRetention": 4.5,
+        "corrosion": 7
+      },
+      "predicted": {
+        "toughness": 4.96,
+        "edgeRetention": 4.17,
+        "corrosion": 7.08
+      },
+      "confidence95": {
+        "toughness": 3.47,
+        "edgeRetention": 1.02,
+        "corrosion": 1.01
+      }
+    },
+    {
+      "name": "Elmax",
+      "actual": {
+        "toughness": 4,
+        "edgeRetention": 5.5,
+        "corrosion": 8
+      },
+      "predicted": {
+        "toughness": 4.29,
+        "edgeRetention": 6.07,
+        "corrosion": 8.07
+      },
+      "confidence95": {
+        "toughness": 3.11,
+        "edgeRetention": 0.92,
+        "corrosion": 0.91
+      }
+    },
+    {
+      "name": "LC200N",
+      "actual": {
+        "toughness": 8.5,
+        "edgeRetention": 3,
+        "corrosion": 10
+      },
+      "predicted": {
+        "toughness": 7.72,
+        "edgeRetention": 2.79,
+        "corrosion": 9.81
+      },
+      "confidence95": {
+        "toughness": 3.7,
+        "edgeRetention": 1.09,
+        "corrosion": 1.08
+      }
+    },
+    {
+      "name": "M390/20CV/204P",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 6.5,
+        "corrosion": 9
+      },
+      "predicted": {
+        "toughness": 3.5,
+        "edgeRetention": 7.06,
+        "corrosion": 8.83
+      },
+      "confidence95": {
+        "toughness": 3.13,
+        "edgeRetention": 0.93,
+        "corrosion": 0.91
+      }
+    },
+    {
+      "name": "M398",
+      "actual": {
+        "toughness": 2.5,
+        "edgeRetention": 9,
+        "corrosion": 8
+      },
+      "predicted": {
+        "toughness": 2.24,
+        "edgeRetention": 8.31,
+        "corrosion": 7.88
+      },
+      "confidence95": {
+        "toughness": 3.53,
+        "edgeRetention": 1.04,
+        "corrosion": 1.03
+      }
+    },
+    {
+      "name": "MagnaCut",
+      "actual": {
+        "toughness": 7,
+        "edgeRetention": 5,
+        "corrosion": 9.5
+      },
+      "predicted": {
+        "toughness": 6.77,
+        "edgeRetention": 4.92,
+        "corrosion": 8.78
+      },
+      "confidence95": {
+        "toughness": 3.78,
+        "edgeRetention": 1.12,
+        "corrosion": 1.1
+      }
+    },
+    {
+      "name": "N690",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 4.5,
+        "corrosion": 8
+      },
+      "predicted": {
+        "toughness": 3.18,
+        "edgeRetention": 4.53,
+        "corrosion": 8.16
+      },
+      "confidence95": {
+        "toughness": 3.16,
+        "edgeRetention": 0.93,
+        "corrosion": 0.92
+      }
+    },
+    {
+      "name": "Nitro-V",
+      "actual": {
+        "toughness": 7.5,
+        "edgeRetention": 3,
+        "corrosion": 7
+      },
+      "predicted": {
+        "toughness": 7.18,
+        "edgeRetention": 3.06,
+        "corrosion": 7.25
+      },
+      "confidence95": {
+        "toughness": 3.14,
+        "edgeRetention": 0.93,
+        "corrosion": 0.92
+      }
+    },
+    {
+      "name": "S110V",
+      "actual": {
+        "toughness": 3,
+        "edgeRetention": 8,
+        "corrosion": 9
+      },
+      "predicted": {
+        "toughness": 3.11,
+        "edgeRetention": 7.94,
+        "corrosion": 9.33
+      },
+      "confidence95": {
+        "toughness": 3.95,
+        "edgeRetention": 1.17,
+        "corrosion": 1.15
+      }
+    },
+    {
+      "name": "S125V",
+      "actual": {
+        "toughness": 2.5,
+        "edgeRetention": 9.5,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 2.23,
+        "edgeRetention": 9.71,
+        "corrosion": 6.8
+      },
+      "confidence95": {
+        "toughness": 3.58,
+        "edgeRetention": 1.06,
+        "corrosion": 1.04
+      }
+    },
+    {
+      "name": "S30V",
+      "actual": {
+        "toughness": 4,
+        "edgeRetention": 6,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 4.21,
+        "edgeRetention": 6.14,
+        "corrosion": 7.83
+      },
+      "confidence95": {
+        "toughness": 3.46,
+        "edgeRetention": 1.02,
+        "corrosion": 1.01
+      }
+    },
+    {
+      "name": "S35VN",
+      "actual": {
+        "toughness": 5,
+        "edgeRetention": 5,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 5.31,
+        "edgeRetention": 5.5,
+        "corrosion": 7.94
+      },
+      "confidence95": {
+        "toughness": 3.08,
+        "edgeRetention": 0.91,
+        "corrosion": 0.9
+      }
+    },
+    {
+      "name": "S45VN",
+      "actual": {
+        "toughness": 4,
+        "edgeRetention": 5.5,
+        "corrosion": 8
+      },
+      "predicted": {
+        "toughness": 3.97,
+        "edgeRetention": 5.69,
+        "corrosion": 8.43
+      },
+      "confidence95": {
+        "toughness": 3.24,
+        "edgeRetention": 0.96,
+        "corrosion": 0.95
+      }
+    },
+    {
+      "name": "S60V",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 7,
+        "corrosion": 7
+      },
+      "predicted": {
+        "toughness": 3.49,
+        "edgeRetention": 7.13,
+        "corrosion": 7.44
+      },
+      "confidence95": {
+        "toughness": 3.18,
+        "edgeRetention": 0.94,
+        "corrosion": 0.93
+      }
+    },
+    {
+      "name": "S90V",
+      "actual": {
+        "toughness": 3.5,
+        "edgeRetention": 9,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 4.89,
+        "edgeRetention": 9.06,
+        "corrosion": 7.43
+      },
+      "confidence95": {
+        "toughness": 3.56,
+        "edgeRetention": 1.05,
+        "corrosion": 1.04
+      }
+    },
+    {
+      "name": "Super Gold 2",
+      "actual": {
+        "toughness": 4,
+        "edgeRetention": 5,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 4.35,
+        "edgeRetention": 5.25,
+        "corrosion": 7.45
+      },
+      "confidence95": {
+        "toughness": 3.2,
+        "edgeRetention": 0.95,
+        "corrosion": 0.93
+      }
+    },
+    {
+      "name": "Vanax",
+      "actual": {
+        "toughness": 5,
+        "edgeRetention": 5.5,
+        "corrosion": 10
+      },
+      "predicted": {
+        "toughness": 5.2,
+        "edgeRetention": 5.5,
+        "corrosion": 10.08
+      },
+      "confidence95": {
+        "toughness": 4.09,
+        "edgeRetention": 1.21,
+        "corrosion": 1.19
+      }
+    },
+    {
+      "name": "VG10",
+      "actual": {
+        "toughness": 4,
+        "edgeRetention": 4.5,
+        "corrosion": 7.5
+      },
+      "predicted": {
+        "toughness": 4.02,
+        "edgeRetention": 4.14,
+        "corrosion": 7.3
+      },
+      "confidence95": {
+        "toughness": 3.11,
+        "edgeRetention": 0.92,
+        "corrosion": 0.91
+      }
+    },
+    {
+      "name": "XHP",
+      "actual": {
+        "toughness": 5,
+        "edgeRetention": 5.5,
+        "corrosion": 6.5
+      },
+      "predicted": {
+        "toughness": 5.3,
+        "edgeRetention": 4.89,
+        "corrosion": 6.41
+      },
+      "confidence95": {
+        "toughness": 3.53,
+        "edgeRetention": 1.04,
+        "corrosion": 1.03
+      }
+    }
+  ]
+}

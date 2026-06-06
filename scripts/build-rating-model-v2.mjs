@@ -100,7 +100,7 @@ function getElement(comp, el) {
 
 function isPM(steel) {
   const t = (steel.tech || '').toUpperCase();
-  return (t === 'PM' || t === 'CPM' || t === 'MM') ? 1 : 0;
+  const n = (steel.name || '').toUpperCase(); return (t === 'PM' || t === 'CPM' || t === 'MM' || n.includes('CPM') || n.includes('MICRO-MELT')) ? 1 : 0;
 }
 
 // ============================================================
