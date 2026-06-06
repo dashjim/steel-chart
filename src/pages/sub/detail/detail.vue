@@ -18,6 +18,44 @@
       </view>
     </view>
 
+    <view class="section ratings-section" v-if="ratings">
+      <text class="section-label">性能评分 (0-10)</text>
+      <view class="rating-group" v-if="ratings.larrin">
+        <text class="rating-source">实测数据 (Larrin Thomas)</text>
+        <view class="rating-row">
+          <view class="rating-item">
+            <text class="rating-label">韧性</text>
+            <text class="rating-value">{{ ratings.larrin.toughness }}</text>
+          </view>
+          <view class="rating-item">
+            <text class="rating-label">保持性</text>
+            <text class="rating-value">{{ ratings.larrin.edgeRetention }}</text>
+          </view>
+          <view class="rating-item">
+            <text class="rating-label">防锈</text>
+            <text class="rating-value">{{ ratings.larrin.corrosion }}</text>
+          </view>
+        </view>
+      </view>
+      <view class="rating-group">
+        <text class="rating-source">{{ ratings.larrin ? '成分估算' : '成分估算 (无实测数据)' }}</text>
+        <view class="rating-row">
+          <view class="rating-item">
+            <text class="rating-label">韧性</text>
+            <text class="rating-value est">{{ ratings.estimated.toughness }}</text>
+          </view>
+          <view class="rating-item">
+            <text class="rating-label">保持性</text>
+            <text class="rating-value est">{{ ratings.estimated.edgeRetention }}</text>
+          </view>
+          <view class="rating-item">
+            <text class="rating-label">防锈</text>
+            <text class="rating-value est">{{ ratings.estimated.corrosion }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <view class="section" v-if="steelMaker || steelTech">
       <view class="info-row" v-if="steelMaker"><text class="info-text" user-select>制造商: {{ steelMaker }}</text></view>
       <view class="info-row" v-if="steelTech"><text class="info-text" user-select>工艺: {{ steelTech }}</text></view>
@@ -64,6 +102,7 @@
 <script>
 import { getSteelById, getAllSteels } from '@/utils/data.js'
 import { search } from '@/utils/search.js'
+import { getRatings } from '@/utils/ratings.js'
 
 const EL_NAMES = {
   C: '碳', Cr: '铬', Mo: '钼', V: '钒', W: '钨',
@@ -80,6 +119,7 @@ export default {
       steelTech: '',
       steelStandard: '',
       steelCountry: '',
+      ratings: null,
       descParts: [],
       compList: [],
       aliasList: []
@@ -101,6 +141,7 @@ export default {
       this.steelTech = steel.tech ? (TECH_NAMES[steel.tech] || steel.tech) : ''
       this.steelStandard = steel.standard || ''
       this.steelCountry = steel.country || ''
+      this.ratings = getRatings(steel)
       this.descParts = this.parseDescription(steel.desc || '')
       if (steel.composition) {
         this.compList = Object.entries(steel.composition).map(([el, vals]) => ({
@@ -231,6 +272,51 @@ export default {
   font-weight: bold;
   display: block;
   margin-bottom: 16rpx;
+}
+
+.ratings-section {
+  background-color: #0a0a0a;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.rating-group {
+  margin-bottom: 20rpx;
+}
+
+.rating-source {
+  color: #888;
+  font-size: 24rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.rating-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.rating-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rating-label {
+  color: #999;
+  font-size: 22rpx;
+  margin-bottom: 6rpx;
+}
+
+.rating-value {
+  color: #FFD700;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.rating-value.est {
+  color: #4A90D9;
+  font-size: 32rpx;
 }
 
 .comp-list {
