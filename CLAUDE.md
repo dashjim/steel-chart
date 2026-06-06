@@ -3,7 +3,7 @@
 刀具钢材化学成分数据库微信小程序。已上线。
 
 GitHub: https://github.com/dashjim/steel-chart
-当前版本: v1.0.4
+当前版本: v1.1.1
 
 ## 技术栈
 
@@ -126,25 +126,44 @@ Larrin Thomas (knifesteelnerds.com) 的实测数据：
 
 ### 线性回归估算模型
 
-对没有 Larrin 实测数据的钢材，用成分估算：
+对没有 Larrin 实测数据的钢材，用 v2 模型（13 个交叉特征 + Ridge 正则化）估算。
 
-```
-韧性 = 9.69 - 2.99×C - 0.13×Cr - 0.09×Mo + 0.23×V - 0.32×W + 1.71×isPM
-保持性 = 0.57 + 1.38×C + 0.12×Cr + 0.25×V + 0.28×W + 0.58×N + 0.55×isPM
-防锈 = 2.42 - 2.47×C + 0.47×Cr + 0.17×Mo + 0.49×V + 0.75×Nb
-```
+模型特征包括：基础成分(C/Cr/Mo/V/W/Co/Nb/N) + isPM + 交叉特征(V×C, Cr×C, W×C, Cr-C×4, 游离Cr估算, 总碳化物体积, C², V², Cr×Mo, V×isPM, C×isPM, Cr×N, Mo×N)
 
-模型精度：
-| 指标 | R² | 平均误差 |
-|------|-----|----------|
-| 保持性 | 0.972 | ~0.5分 |
-| 防锈 | 0.972 | ~0.5分 |
-| 韧性 | 0.604 | ~1.5分 |
+模型精度（v2, 60 个训练样本）：
+| 指标 | R² | RMSE |
+|------|-----|------|
+| 保持性 | 0.984 | 0.33 |
+| 防锈 | 0.990 | 0.33 |
+| 韧性 | 0.762 | 1.12 |
 
-### 下一步计划
-- [ ] 在详情页显示评分（有 Larrin 数据的显示实测，无的显示估算+标注）
-- [ ] CATRA 天梯图数据集成
-- [ ] 韧性模型改进（考虑加入碳化物体积估算作为中间变量）
+### isPM 判断规则
+以下任一条件满足即视为粉末钢（isPM=1）：
+- tech 字段为 PM / CPM / MM
+- 名称包含 "CPM" 或 "Micro-Melt"
+
+### 韧性模型已知局限
+韧性 R²=0.76 是成分模型的天花板。无法准确预测的情况：
+- **K390/Vanadis 8**：超高 V 粉末钢，碳化物极细韧性远超成分暗示（低估 3-4 分）
+- **AEB-L/14C28N**：简单不锈钢但热处理极优，韧性 9（低估 2-3 分）
+- **1.4116**：Larrin 测的样品可能热处理差（高估 4 分）
+- 极端成分钢（ZDP-189 C=3%）会被 clamp(0,10) 截断
+
+尝试过的改进方向（效果有限）：
+- sqrt/log 非线性特征 → R² 仅从 0.76 到 0.76
+- 区分碳化物类型（VC细/CrC粗）→ K390 改善但整体 R² 下降
+- 结论：韧性根本依赖热处理和微观组织，成分无法完全捕捉
+
+### 已完成
+- [x] 详情页显示评分（有 Larrin 数据的显示金色实测，无的显示蓝色估算）
+- [x] CATRA 天梯图数据（60 种钢材，存于 catra-data.json）
+- [x] 评分区域加 ⓘ 图标跳转关于页查看模型说明
+- [x] 关于页标注数据来源和模型表现
+
+### 下一步可做
+- [ ] 详情页加 CATRA 切割数据（TCC mm + 硬度 Rc）
+- [ ] 韧性预测标注"低置信度"
+- [ ] 基于 CATRA 数据的保持性天梯排名页
 
 ## 数据处理流程
 
@@ -158,8 +177,8 @@ node scripts/fetch-descriptions.mjs
 # 3. 翻译为中文（需 AWS Bedrock，~3分钟）
 node scripts/translate-descriptions.mjs
 
-# 4. 构建评分模型（需 larrin-ratings.json）
-node scripts/build-rating-model.mjs
+# 4. 构建评分模型 v2（需 larrin-ratings.json）
+node scripts/build-rating-model-v2.mjs
 ```
 
 ## 已踩过的坑
@@ -174,6 +193,9 @@ node scripts/build-rating-model.mjs
 8. **URL 提取遗漏** — 438 种钢材的详情页 URL 没从表格正则中提取到，需用主名称推导
 9. **嵌套 text 才能内联** — 小程序中 template+view 会换行，只有 text 嵌套 text 保持内联
 10. **分包必须配合数据位置** — JSON 放 static/ 会被复制到产物，放 src/data/ 通过 import 打包不会重复
+11. **主包页面 import JSON 不能用 @/ alias** — 编译出错误路径 `pages/index/@/data/...`，必须用相对路径 `../../data/`
+12. **Array.sort() 会修改原数组** — 对比页 `steelIds.sort()` 导致 ids 和 names 索引不对应，必须 `.slice().sort()`
+13. **isPM 判断不全** — PM/CPM/MM/名称含CPM 都是粉末钢，之前只判断了前两种导致韧性预测偏低
 
 ## 设计文档
 
