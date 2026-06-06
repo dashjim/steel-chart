@@ -19,7 +19,10 @@
     </view>
 
     <view class="section ratings-section" v-if="ratings">
-      <text class="section-label">性能评分 (0-10)</text>
+      <view class="rating-header">
+        <text class="section-label">性能评分 (0-10)</text>
+        <text class="info-icon" @click="goAbout">ⓘ</text>
+      </view>
       <view class="rating-group" v-if="ratings.larrin">
         <text class="rating-source">实测数据 (Larrin Thomas)</text>
         <view class="rating-row">
@@ -221,6 +224,9 @@ export default {
     goSteelByName(id, name) {
       uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + id + '&name=' + encodeURIComponent(name) })
     },
+    goAbout() {
+      uni.switchTab({ url: '/pages/about/about' })
+    },
     goElementInfo(index) {
       const el = this.compList[index] && this.compList[index].el
       if (el) uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
@@ -278,6 +284,17 @@ export default {
   background-color: #0a0a0a;
   border-radius: 12rpx;
   padding: 24rpx;
+}
+
+.rating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-icon {
+  color: #666;
+  font-size: 32rpx;
 }
 
 .rating-group {

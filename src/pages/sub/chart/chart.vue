@@ -23,11 +23,11 @@
 
     <scroll-view class="legend" scroll-y v-if="selectedSteels.length > 0">
       <view v-for="(steel, idx) in selectedSteels" :key="idx" class="legend-item" @click="goDetail(idx)">
+        <text v-if="selectedSteels.length > 1" class="legend-remove" @click.stop="removeSteel(idx)">✕</text>
         <view class="legend-left">
           <text class="legend-name">{{ steel.name }}</text>
           <text class="legend-comp">{{ formatComp(steel) }}</text>
         </view>
-        <text v-if="selectedSteels.length > 1" class="legend-remove" @click.stop="removeSteel(idx)">✕</text>
       </view>
     </scroll-view>
 
@@ -289,12 +289,12 @@ export default {
 }
 
 .add-icon {
-  font-size: 44rpx;
+  font-size: 48rpx;
+  font-weight: bold;
 }
 
 .fav-icon {
-  font-size: 36rpx;
-  color: #FFD700;
+  font-size: 40rpx;
 }
 
 .toolbar-label {
