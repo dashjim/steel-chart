@@ -78,8 +78,10 @@ export default {
         larrinList.push({ ...s, displayName: name })
       }
     }
+    const pmSteels = larrinList.filter(s => s.tech === 'PM' || s.tech === 'CPM')
+    const nonPmSteels = larrinList.filter(s => s.tech !== 'PM' && s.tech !== 'CPM')
     const rest = all.filter(s => !larrinIds.has(s.id))
-    this.allSteels = [...larrinList, ...rest]
+    this.allSteels = [...pmSteels, ...nonPmSteels, ...rest]
     this.refreshFavorites()
   },
   onShareAppMessage() {
