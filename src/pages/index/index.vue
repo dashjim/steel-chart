@@ -66,7 +66,16 @@ export default {
     this.refreshFavorites()
   },
   onLoad() {
-    this.allSteels = getAllSteels()
+    const larrinNames = require('@/data/larrin-ratings.json').map(r => r.name.toLowerCase())
+    const all = getAllSteels()
+    const larrin = []
+    const rest = []
+    for (const s of all) {
+      const isLarrin = larrinNames.some(ln => ln === s.name.toLowerCase() || ln.includes(s.name.toLowerCase()) || (s.aliases && s.aliases.some(a => ln.includes(a.toLowerCase()))))
+      if (isLarrin) larrin.push(s)
+      else rest.push(s)
+    }
+    this.allSteels = [...larrin, ...rest]
     this.refreshFavorites()
   },
   onShareAppMessage() {
