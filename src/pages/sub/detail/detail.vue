@@ -29,7 +29,7 @@
     </view>
 
     <view class="section" v-if="descParts.length">
-      <text class="section-label">Notes:</text>
+      <text class="section-label">描述:</text>
       <text class="description-text" user-select>
         <text
           v-for="(part, idx) in descParts"
@@ -41,7 +41,7 @@
     </view>
 
     <view class="section" v-if="aliasList.length">
-      <text class="section-label">Cross-References:</text>
+      <text class="section-label">交叉引用:</text>
       <view class="aliases-list">
         <text
           class="alias-link"
@@ -229,7 +229,6 @@ export default {
   color: #ffffff;
   font-size: 30rpx;
   font-weight: bold;
-  font-style: italic;
   display: block;
   margin-bottom: 16rpx;
 }
@@ -276,8 +275,7 @@ export default {
 
 .description-text {
   color: #cccccc;
-  font-size: 26rpx;
-  font-style: italic;
+  font-size: 30rpx;
   line-height: 1.6;
 }
 
