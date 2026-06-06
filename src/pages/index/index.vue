@@ -67,17 +67,19 @@ export default {
     this.refreshFavorites()
   },
   onLoad() {
-    const larrinNames = larrinRatings.map(r => r.name.toLowerCase())
     const all = getAllSteels()
-    const larrin = []
-    const rest = []
-    for (const s of all) {
-      const nameLower = s.name.toLowerCase()
-      const isLarrin = larrinNames.some(ln => ln === nameLower || ln.includes(nameLower)) || (s.aliases && s.aliases.some(a => larrinNames.some(ln => ln.includes(a.toLowerCase()))))
-      if (isLarrin) larrin.push(s)
-      else rest.push(s)
+    const larrinIds = new Set()
+    const larrinList = []
+    for (const r of larrinRatings) {
+      const name = r.name
+      const s = all.find(st => st.name.toLowerCase() === name.toLowerCase() || (st.aliases && st.aliases.some(a => a.toLowerCase() === name.toLowerCase())))
+      if (s && !larrinIds.has(s.id)) {
+        larrinIds.add(s.id)
+        larrinList.push({ ...s, displayName: name })
+      }
     }
-    this.allSteels = [...larrin, ...rest]
+    const rest = all.filter(s => !larrinIds.has(s.id))
+    this.allSteels = [...larrinList, ...rest]
     this.refreshFavorites()
   },
   onShareAppMessage() {
