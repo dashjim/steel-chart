@@ -45,7 +45,7 @@
 import { getAllSteels } from '@/utils/data'
 import { search, fuzzySearch } from '@/utils/search'
 import { getFavorites, toggleFavorite } from '@/utils/favorites'
-import larrinRatings from '@/data/larrin-ratings.json'
+import larrinRatings from '../../data/larrin-ratings.json'
 
 export default {
   data() {
