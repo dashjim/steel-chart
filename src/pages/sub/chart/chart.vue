@@ -133,7 +133,7 @@ export default {
     },
     saveCompare() {
       if (this.selectedSteels.length === 0) return
-      const favId = 'compare_' + this.steelIds.sort((a, b) => a - b).join('_')
+      const favId = 'compare_' + this.steelIds.slice().sort((a, b) => a - b).join('_')
       const favs = uni.getStorageSync('favorites') || []
       if (favs.some(f => f.id === favId)) {
         uni.showToast({ title: '已在收藏中', icon: 'none' })
