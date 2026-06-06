@@ -4,6 +4,12 @@ import ratingModel from '@/data/rating-model-v2.json'
 const larrinMap = {}
 for (const r of larrinRatings) {
   larrinMap[r.name.toLowerCase()] = r
+  if (r.name.includes('/')) {
+    for (const part of r.name.split('/')) {
+      const key = part.trim().toLowerCase()
+      if (!larrinMap[key]) larrinMap[key] = r
+    }
+  }
 }
 
 function computeFeatures(comp) {
