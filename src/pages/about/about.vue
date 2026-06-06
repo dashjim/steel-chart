@@ -2,7 +2,7 @@
 <template>
   <view class="page">
     <view class="app-name">钢材成分图表</view>
-    <view class="version">版本 1.1.0</view>
+    <view class="version">版本 1.1.1</view>
     <view class="desc">刀具钢材化学成分数据库，收录 1451 种钢材、34899 个名称（含各国标准别名），帮助您了解各种钢材的元素组成及其对性能的影响。</view>
     <view class="stats">
       <view class="stat-item">钢材种类: 1451</view>
