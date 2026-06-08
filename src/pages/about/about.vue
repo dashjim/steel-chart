@@ -13,9 +13,9 @@
     <view class="section-title">性能预测模型</view>
     <view class="model-desc">基于冶金学家 Larrin Thomas (knifesteelnerds.com) 对 61 种刀具钢的实测数据（CATRA 切割测试、Charpy 冲击测试、盐雾腐蚀测试），训练线性回归模型，用于估算未测试钢材的韧性、保持性和防锈评分（满分10分）。</view>
     <view class="stats">
-      <view class="stat-item">保持性预测 R²: 0.98（误差 ±0.3分）</view>
-      <view class="stat-item">防锈预测 R²: 0.99（误差 ±0.3分）</view>
-      <view class="stat-item">韧性预测 R²: 0.76（误差 ±1.1分）</view>
+      <view class="stat-item">保持性预测 R²: 0.98（平均误差 ±0.3分）</view>
+      <view class="stat-item">防锈预测 R²: 0.99（平均误差 ±0.3分）</view>
+      <view class="stat-item">韧性预测 R²: 0.76（平均误差 ±1分，粉末钢已校正）</view>
     </view>
     <view class="model-note">注: 韧性受热处理和微观组织影响大，仅凭成分预测精度有限。有实测数据的钢材优先显示实测评分。</view>
     <view class="section-title">数据来源</view>

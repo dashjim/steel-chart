@@ -77,7 +77,7 @@ export function getRatings(steel) {
 
   const features = computeFeatures(comp)
   let toughness = predict(features, 'toughness')
-  if (comp.isPM) toughness = Math.min(10, toughness + 2.5)
+  if (comp.isPM) toughness = Math.min(10, toughness + 1.5)
   const estimated = {
     toughness: Math.round(toughness * 2) / 2,
     edgeRetention: predict(features, 'edgeRetention'),
