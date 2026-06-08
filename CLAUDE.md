@@ -3,7 +3,8 @@
 刀具钢材化学成分数据库微信小程序。已上线。
 
 GitHub: https://github.com/dashjim/steel-chart
-当前版本: v1.1.1
+当前版本: v1.1.1 (待发布 v1.2.0)
+AppID: wx5a77a7218df15b30
 
 ## 技术栈
 
@@ -21,14 +22,16 @@ GitHub: https://github.com/dashjim/steel-chart
 steel-chart/
 ├── src/
 │   ├── pages/
-│   │   ├── index/              # 首页：钢材列表 + 实时搜索 + 模糊搜索按钮
+│   │   ├── index/              # 首页：Google风格（标题+搜索框+天梯图入口）
 │   │   ├── favorites/          # 收藏页（支持单钢材和对比组合收藏）
-│   │   ├── about/              # 关于页
-│   │   └── sub/                # 子包（按需加载）
-│   │       ├── detail/         # 钢材详情（成分/工艺/描述/别名/链接跳转）
-│   │       ├── chart/          # 成分对比图（质量%/原子数/摩尔%，最多5种对比）
+│   │   ├── about/              # 关于页（数据来源+模型说明）
+│   │   └── sub/                # 子包（按需加载，共152KB）
+│   │       ├── search/         # 搜索页（自动聚焦，实时+模糊搜索）
+│   │       ├── detail/         # 钢材详情（成分/评分/工艺/描述/别名/链接）
+│   │       ├── chart/          # 成分对比图（质量%/原子数/摩尔%，最多5种）
 │   │       │   ├── chart.vue
 │   │       │   └── select-steel.vue  # 搜索选择对比钢材
+│   │       ├── ladder/         # CATRA天梯图（图片可放大+轴含义说明）
 │   │       ├── elements/       # 元素列表
 │   │       └── element-info/   # 元素说明（专业冶金学描述）
 │   ├── components/
@@ -37,12 +40,14 @@ steel-chart/
 │   │   ├── steels.json         # 1451种钢材主数据（含中文描述）
 │   │   ├── searchIndex.json    # 搜索索引（id → 名称数组）
 │   │   ├── larrin-ratings.json # Larrin Thomas 实测评分（61种钢材）
-│   │   └── rating-model.json   # 线性回归模型系数
+│   │   ├── rating-model-v2.json # v2线性回归模型系数（13交叉特征）
+│   │   └── catra-data.json    # CATRA切割数据（60种，TCC mm + Rc）
 │   ├── utils/
 │   │   ├── data.js             # 数据加载（getSteelById 返回深拷贝）
 │   │   ├── search.js           # 搜索（includes + 编辑距离模糊）
 │   │   ├── favorites.js        # 收藏管理（支持 compareData）
-│   │   └── composition.js      # 成分计算（原子数/摩尔%）
+│   │   ├── composition.js      # 成分计算（原子数/摩尔%）
+│   │   └── ratings.js          # 性能评分（Larrin实测 + v2模型估算）
 │   ├── manifest.json
 │   └── pages.json              # 路由 + TabBar + 子包配置
 ├── scripts/
@@ -74,7 +79,8 @@ node scripts/build-rating-model.mjs  # 重建评分模型
 - 有制造商: 645
 - 有工艺: 216（PM/CPM/ESR/MM/SF/VIM）
 - Larrin 实测评分: 61 种钢材
-- 构建产物: ~1.2MB
+- CATRA 切割数据: 60 种钢材
+- 构建产物: 主包 1.3MB + 子包 152KB = 1.4MB（gzip 传输 ~420KB）
 
 ## 关键设计决策
 
@@ -84,8 +90,15 @@ JSON 通过 `import` 编译进 JS bundle。**不能用** `wx.getFileSystemManage
 ### Vue 响应式陷阱（重要！）
 `getSteelById()` 必须返回 `JSON.parse(JSON.stringify(steel))` 深拷贝。否则 Vue 会代理缓存中的原始对象，页面销毁后 ctx 变 null 导致崩溃。详情页的 data 只存基本类型和纯数组，**绝不存原始 steel 对象引用**。v-for 中的 @click 事件传 index 而非对象属性。
 
-### 搜索逻辑
+### 首页设计（Google 风格）
+- 首页只有：标题 + 副标题（数据统计）+ 大搜索框 + 天梯图入口
+- 搜索框是"假的"——点击跳转到子包 `sub/search/search`（真搜索页）
+- 不再在首页加载 1451 条数据列表
+- 目的：用户打开瞬间理解这是什么应用，不会因为看到一堆数字编号钢材而流失
+
+### 搜索逻辑（sub/search 页面）
 - 所有名称（主名称 + 别名）扁平化为独立条目
+- 自动聚焦输入框
 - 实时搜索：`name.includes(keyword)`，按精确>前缀>包含+长度排序
 - 模糊搜索（"模糊"按钮触发）：对全部 34899 条计算编辑距离，返回 top 50
 - 同名称多钢材时，优先指向主名称包含搜索词的钢材
@@ -93,10 +106,12 @@ JSON 通过 `import` 编译进 JS bundle。**不能用** `wx.getFileSystemManage
 - 搜索结果和收藏都存 displayName（用户看到的名称）
 
 ### 图表对比功能
-- 详情页"查看图表和对比" → 图表页
+- 详情页评分标题右侧有"对比"按钮（pill 样式）→ 进入图表页
 - 图表页底部: +对比（跳搜索选择页）/ ★收藏
-- 最多 5 种钢材同时对比
-- 图例旁 ✕ 按钮移除单个钢材
+- 最多 5 种钢材同时对比，5 种颜色（蓝/橙/绿/红/紫）
+- 图例左侧 ✕ 按钮移除单个钢材
+- 图例显示成分（元素白色，数值灰色）
+- 点击图例行进入该钢材详情页
 - 对比组合可收藏（收藏页显示 "M390 / CPM 3V / D2"，点击直达图表）
 
 ### 图表计算
