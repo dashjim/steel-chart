@@ -26,7 +26,11 @@
         <text v-if="selectedSteels.length > 1" class="legend-remove" @click.stop="removeSteel(idx)">✕</text>
         <view class="legend-left">
           <text class="legend-name">{{ steel.name }}</text>
-          <text class="legend-comp">{{ formatComp(steel) }}</text>
+          <view class="legend-comp">
+            <text v-for="(part, pi) in formatComp(steel)" :key="pi" class="comp-part">
+              <text class="comp-el-text">{{ part.el }}:</text><text class="comp-val-text">{{ part.val }} </text>
+            </text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -155,13 +159,13 @@ export default {
       uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + id + '&name=' + encodeURIComponent(name) })
     },
     formatComp(steel) {
-      if (!steel.composition) return ''
+      if (!steel.composition) return []
       const parts = []
       for (const [el, vals] of Object.entries(steel.composition)) {
         const v = vals.length === 2 ? vals[1] : vals[0]
-        parts.push(el + ':' + v)
+        parts.push({ el, val: v })
       }
-      return parts.join(' ')
+      return parts
     },
     computeAutoMax() {
       let max = 0
@@ -238,13 +242,15 @@ export default {
 .legend-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16rpx 0;
   border-bottom: 1rpx solid #222;
+  overflow: hidden;
 }
 
 .legend-left {
   flex: 1;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .legend-name {
@@ -255,10 +261,26 @@ export default {
 }
 
 .legend-comp {
-  color: #666;
-  font-size: 22rpx;
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
   margin-top: 4rpx;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.comp-part {
+  font-size: 22rpx;
+  white-space: nowrap;
+}
+
+.comp-el-text {
+  color: #ffffff;
+  font-size: 22rpx;
+}
+
+.comp-val-text {
+  color: #888;
+  font-size: 22rpx;
 }
 
 .legend-remove {

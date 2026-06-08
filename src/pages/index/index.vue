@@ -1,90 +1,19 @@
 <template>
   <view class="page">
-    <view class="search-bar" :class="{ focused: searchFocused, sorting: sorting }">
-      <text class="search-icon">&#x1F50D;</text>
-      <input
-        class="search-input"
-        type="text"
-        placeholder="搜索钢材..."
-        placeholder-style="color: #666"
-        :value="keyword"
-        :disabled="sorting"
-        @input="onInput"
-        @focus="searchFocused = true"
-        @blur="searchFocused = false"
-      />
-      <text
-        v-if="keyword"
-        class="sort-btn"
-        :class="{ disabled: sorting }"
-        @click="onSort"
-      >{{ sorting ? '搜索中...' : '模糊' }}</text>
+    <view class="landing">
+      <text class="app-title">钢材成分图表</text>
+      <text class="app-subtitle">1451种钢材 · 34899个名称 · 性能评分</text>
+      <view class="fake-search" @click="goSearch">
+        <text class="search-icon">&#x1F50D;</text>
+        <text class="search-placeholder">搜索钢材名称...</text>
+      </view>
+      <text class="ladder-link" @click="goLadder">CATRA 保持性天梯图 ></text>
     </view>
-    <scroll-view class="steel-list" scroll-y>
-      <view
-        v-for="(item, idx) in displayList"
-        :key="idx"
-        class="steel-item"
-        @click="goDetail(item)"
-      >
-        <text class="steel-name">{{ item.displayName || item.name }}</text>
-        <text
-          class="star-icon"
-          :class="{ favorited: favSet[item.id] }"
-          @click.stop="onToggleFavorite(item)"
-        >&#x2605;</text>
-      </view>
-      <view v-if="keyword && displayList.length === 0" class="empty-tip">
-        <text class="empty-text">未找到匹配的钢材</text>
-      </view>
-    </scroll-view>
   </view>
 </template>
 
 <script>
-import { getAllSteels } from '@/utils/data'
-import { search, fuzzySearch } from '@/utils/search'
-import { getFavorites, toggleFavorite } from '@/utils/favorites'
-import larrinRatings from '../../data/larrin-ratings.json'
-
 export default {
-  data() {
-    return {
-      keyword: '',
-      allSteels: [],
-      searchResults: [],
-      searchFocused: false,
-      sorting: false,
-      favSet: {}
-    }
-  },
-  computed: {
-    displayList() {
-      return this.keyword ? this.searchResults : this.allSteels
-    }
-  },
-  onShow() {
-    this.refreshFavorites()
-  },
-  onLoad() {
-    const all = getAllSteels()
-    const larrinIds = new Set()
-    const larrinList = []
-    for (const r of larrinRatings) {
-      const name = r.name
-      const s = all.find(st => st.name.toLowerCase() === name.toLowerCase() || (st.aliases && st.aliases.some(a => a.toLowerCase() === name.toLowerCase())))
-      if (s && !larrinIds.has(s.id)) {
-        larrinIds.add(s.id)
-        larrinList.push({ ...s, displayName: name })
-      }
-    }
-    const isPM = s => s.tech === 'PM' || s.tech === 'CPM' || s.tech === 'MM' || (s.name || '').toUpperCase().includes('CPM')
-    const pmSteels = larrinList.filter(isPM)
-    const nonPmSteels = larrinList.filter(s => !isPM(s))
-    const rest = all.filter(s => !larrinIds.has(s.id))
-    this.allSteels = [...pmSteels, ...nonPmSteels, ...rest]
-    this.refreshFavorites()
-  },
   onShareAppMessage() {
     return { title: '钢材成分图表 - 刀具钢材数据库', path: '/pages/index/index' }
   },
@@ -92,38 +21,11 @@ export default {
     return {}
   },
   methods: {
-    onInput(e) {
-      const val = e.detail.value
-      this.keyword = val
-      if (val) {
-        this.searchResults = search(val)
-      } else {
-        this.searchResults = []
-      }
+    goSearch() {
+      uni.navigateTo({ url: '/pages/sub/search/search' })
     },
-    onSort() {
-      if (this.sorting || !this.keyword) return
-      this.sorting = true
-      setTimeout(() => {
-        this.searchResults = fuzzySearch(this.keyword)
-        this.sorting = false
-      }, 50)
-    },
-    goDetail(item) {
-      const name = encodeURIComponent(item.displayName || item.name)
-      uni.navigateTo({ url: '/pages/sub/detail/detail?id=' + item.id + '&name=' + name })
-    },
-    onToggleFavorite(item) {
-      toggleFavorite(item.id, item.displayName || item.name)
-      this.refreshFavorites()
-    },
-    refreshFavorites() {
-      const favs = getFavorites()
-      const set = {}
-      for (const f of favs) {
-        set[f.id] = true
-      }
-      this.favSet = set
+    goLadder() {
+      uni.navigateTo({ url: '/pages/sub/ladder/ladder' })
     }
   }
 }
@@ -137,93 +39,52 @@ export default {
   background-color: #000000;
 }
 
-.search-bar {
+.landing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 60rpx;
+}
+
+.app-title {
+  color: #ffffff;
+  font-size: 56rpx;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+
+.app-subtitle {
+  color: #888888;
+  font-size: 26rpx;
+  margin-bottom: 60rpx;
+}
+
+.fake-search {
   display: flex;
   align-items: center;
-  margin: 20rpx 24rpx;
-  padding: 0 20rpx;
-  height: 72rpx;
+  width: 100%;
+  padding: 0 28rpx;
+  height: 80rpx;
   border: 1px solid #333;
-  border-radius: 36rpx;
+  border-radius: 40rpx;
   background-color: #111;
-}
-
-.search-bar.focused {
-  border-color: #ff8c00;
-}
-
-.search-bar.sorting {
-  border-color: #4A90D9;
-}
-
-.sort-btn {
-  font-size: 22rpx;
-  color: #4A90D9;
-  padding: 8rpx 16rpx;
-  border: 1rpx solid #4A90D9;
-  border-radius: 16rpx;
-  margin-left: 12rpx;
-  white-space: nowrap;
-}
-
-.sort-btn.disabled {
-  color: #666;
-  border-color: #666;
+  margin-bottom: 40rpx;
 }
 
 .search-icon {
   font-size: 28rpx;
-  margin-right: 12rpx;
+  margin-right: 16rpx;
 }
 
-.search-input {
-  flex: 1;
-  font-size: 28rpx;
-  color: #ffffff;
-  background-color: transparent;
-}
-
-.steel-list {
-  flex: 1;
-  overflow: hidden;
-}
-
-.steel-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 32rpx;
-  border-bottom: 1px solid #333;
-}
-
-.steel-name {
-  font-size: 30rpx;
-  color: #ffffff;
-}
-
-.steel-sub {
-  color: #888;
-  font-size: 24rpx;
-}
-
-.star-icon {
-  font-size: 36rpx;
-  color: #555;
-  padding: 10rpx;
-}
-
-.star-icon.favorited {
-  color: #FFD700;
-}
-
-.empty-tip {
-  display: flex;
-  justify-content: center;
-  padding: 60rpx 0;
-}
-
-.empty-text {
+.search-placeholder {
   color: #666;
+  font-size: 28rpx;
+}
+
+.ladder-link {
+  color: #FFD700;
   font-size: 28rpx;
 }
 </style>

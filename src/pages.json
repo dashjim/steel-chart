@@ -76,6 +76,24 @@
 						"navigationBarTextStyle": "white",
 						"backgroundColor": "#000000"
 					}
+				},
+				{
+					"path": "search/search",
+					"style": {
+						"navigationBarTitleText": "搜索",
+						"navigationBarBackgroundColor": "#000000",
+						"navigationBarTextStyle": "white",
+						"backgroundColor": "#000000"
+					}
+				},
+				{
+					"path": "ladder/ladder",
+					"style": {
+						"navigationBarTitleText": "天梯图",
+						"navigationBarBackgroundColor": "#000000",
+						"navigationBarTextStyle": "white",
+						"backgroundColor": "#000000"
+					}
 				}
 			]
 		}

@@ -21,7 +21,10 @@
     <view class="section ratings-section" v-if="ratings">
       <view class="rating-header">
         <text class="section-label">性能评分 (0-10)</text>
-        <text class="info-icon" @click="goAbout">ⓘ</text>
+        <view class="rating-header-right">
+          <text class="compare-btn" @click="goChart">对比</text>
+          <text class="info-icon" @click="goAbout">ⓘ</text>
+        </view>
       </view>
       <view class="rating-group" v-if="ratings.larrin">
         <text class="rating-source">实测数据 (Larrin Thomas)</text>
@@ -93,12 +96,6 @@
       </view>
     </view>
 
-    <view class="action-bar">
-      <view class="action-btn" @click="goChart">
-        <text class="action-icon">📊</text>
-        <text class="action-label">查看图表和对比</text>
-      </view>
-    </view>
   </view>
 </template>
 
@@ -292,6 +289,21 @@ export default {
   justify-content: space-between;
 }
 
+.rating-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.compare-btn {
+  color: #ffffff;
+  font-size: 24rpx;
+  padding: 6rpx 20rpx;
+  background-color: #333;
+  border-radius: 20rpx;
+  border: 1rpx solid #555;
+}
+
 .info-icon {
   color: #666;
   font-size: 32rpx;
@@ -398,28 +410,4 @@ export default {
   text-decoration: underline;
 }
 
-.action-bar {
-  margin-top: 60rpx;
-  display: flex;
-  justify-content: center;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 40rpx;
-  background-color: #1a1a1a;
-  border-radius: 40rpx;
-  border: 1rpx solid #333;
-}
-
-.action-icon {
-  font-size: 32rpx;
-  margin-right: 12rpx;
-}
-
-.action-label {
-  color: #ffffff;
-  font-size: 28rpx;
-}
 </style>
