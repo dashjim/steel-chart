@@ -57,6 +57,12 @@
           </view>
         </view>
       </view>
+      <view class="rating-action">
+        <view class="action-btn" @click="goChart">
+          <text class="action-icon">&#x1F4CA;</text>
+          <text class="action-label">对比和图表</text>
+        </view>
+      </view>
     </view>
 
     <view class="section" v-if="steelMaker || steelTech">
@@ -93,12 +99,6 @@
       </view>
     </view>
 
-    <view class="action-bar">
-      <view class="action-btn" @click="goChart">
-        <text class="action-icon">&#x1F4CA;</text>
-        <text class="action-label">对比和图表</text>
-      </view>
-    </view>
   </view>
 </template>
 
@@ -398,29 +398,29 @@ export default {
   text-decoration: underline;
 }
 
-.action-bar {
-  margin-top: 60rpx;
+.rating-action {
+  margin-top: 8rpx;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  padding: 20rpx 40rpx;
+  padding: 14rpx 28rpx;
   background-color: #1a1a1a;
   border-radius: 40rpx;
   border: 1rpx solid #333;
 }
 
 .action-icon {
-  font-size: 32rpx;
-  margin-right: 12rpx;
+  font-size: 30rpx;
+  margin-right: 10rpx;
 }
 
 .action-label {
   color: #ffffff;
-  font-size: 28rpx;
+  font-size: 26rpx;
 }
 
 </style>
