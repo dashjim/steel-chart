@@ -27,9 +27,17 @@ export function getDefaultList() {
     arr.find(s => normName(s.name).includes(key)) ||
     arr[0]
 
+  const isPM = (s) => {
+    const tech = (s.tech || '').toUpperCase()
+    const nameUpper = (s.name || '').toUpperCase()
+    return tech === 'PM' || tech === 'CPM' || tech === 'MM' ||
+      nameUpper.includes('CPM') || nameUpper.includes('MICRO-MELT')
+  }
+
   const seen = new Set()
-  const out = []
-  // 先放 Larrin 实测的知名钢材（按 Larrin 列表顺序）
+  // 先收集 Larrin 实测的知名钢材（按 Larrin 列表顺序）
+  const larrinPM = []
+  const larrinRest = []
   for (const r of larrinRatings) {
     const keys = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])].map(normName)
     let steel = null
@@ -38,10 +46,12 @@ export function getDefaultList() {
     }
     if (steel && !seen.has(steel.id)) {
       seen.add(steel.id)
-      out.push({ id: steel.id, name: steel.name, displayName: steel.name })
+      const item = { id: steel.id, name: steel.name, displayName: steel.name }
+      ;(isPM(steel) ? larrinPM : larrinRest).push(item)
     }
   }
-  // 再接上其余所有钢材
+  // Larrin 粉末钢排最前，再其余 Larrin 钢材，最后所有其余钢材
+  const out = [...larrinPM, ...larrinRest]
   for (const s of steels) {
     if (!seen.has(s.id)) {
       seen.add(s.id)

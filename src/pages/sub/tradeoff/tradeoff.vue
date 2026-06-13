@@ -20,42 +20,21 @@
       </view>
     </view>
 
-    <view class="image-container" @click="openZoom">
+    <view class="image-container" @click="previewImage">
       <image
         class="tradeoff-image"
         src="/static/tradeoff-chart.png"
         mode="widthFix"
       />
-      <text class="tap-hint">点击放大查看</text>
-    </view>
-
-    <view v-if="zoomed" class="zoom-mask" @click="closeZoom">
-      <movable-area class="zoom-area" scale-area>
-        <movable-view
-          class="zoom-view"
-          direction="all"
-          :scale="true"
-          scale-min="1"
-          scale-max="4"
-          :scale-value="1"
-        >
-          <image
-            class="zoom-image"
-            src="/static/tradeoff-chart.png"
-            mode="widthFix"
-          />
-        </movable-view>
-      </movable-area>
-      <text class="zoom-hint">双指缩放 · 点击空白处关闭</text>
+      <text class="tap-hint">点击放大查看（可双指缩放）</text>
     </view>
   </view>
 </template>
 
 <script>
+const IMG = '/static/tradeoff-chart.png'
+
 export default {
-  data() {
-    return { zoomed: false }
-  },
   onShareAppMessage() {
     return { title: '刀具钢材综合性能散点图', path: '/pages/sub/tradeoff/tradeoff' }
   },
@@ -63,11 +42,17 @@ export default {
     return {}
   },
   methods: {
-    openZoom() {
-      this.zoomed = true
-    },
-    closeZoom() {
-      this.zoomed = false
+    previewImage() {
+      // 包内图片 previewImage 不直接支持，先转本地临时路径再预览（系统原生缩放/拖动）
+      uni.getImageInfo({
+        src: IMG,
+        success: (res) => {
+          uni.previewImage({ urls: [res.path], current: res.path })
+        },
+        fail: () => {
+          uni.previewImage({ urls: [IMG] })
+        }
+      })
     }
   }
 }
@@ -148,46 +133,5 @@ export default {
   display: block;
   text-align: center;
   margin-top: 12rpx;
-}
-
-.zoom-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.95);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.zoom-area {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.zoom-view {
-  width: 750rpx;
-  height: 750rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.zoom-image {
-  width: 750rpx;
-}
-
-.zoom-hint {
-  position: fixed;
-  bottom: 60rpx;
-  left: 0;
-  width: 100vw;
-  text-align: center;
-  color: #999;
-  font-size: 24rpx;
 }
 </style>
