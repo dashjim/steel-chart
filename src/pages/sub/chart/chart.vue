@@ -28,7 +28,7 @@
           <text class="legend-name">{{ steel.name }}</text>
           <view class="legend-comp">
             <text v-for="(part, pi) in formatComp(steel)" :key="pi" class="comp-part">
-              <text class="comp-el-text">{{ part.el }}:</text><text class="comp-val-text">{{ part.val }} </text>
+              <text class="comp-el-text">{{ part.el }}:</text><text class="comp-val-text">{{ part.val }}</text>
             </text>
           </view>
         </view>
@@ -263,24 +263,26 @@ export default {
 .legend-comp {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 4rpx;
+  gap: 6rpx 20rpx;
+  margin-top: 8rpx;
   overflow: hidden;
   max-width: 100%;
 }
 
 .comp-part {
-  font-size: 22rpx;
+  font-size: 24rpx;
   white-space: nowrap;
 }
 
 .comp-el-text {
-  color: #ffffff;
-  font-size: 22rpx;
+  color: #FFA500;
+  font-size: 24rpx;
+  font-weight: bold;
 }
 
 .comp-val-text {
-  color: #888;
-  font-size: 22rpx;
+  color: #dddddd;
+  font-size: 24rpx;
 }
 
 .legend-remove {
