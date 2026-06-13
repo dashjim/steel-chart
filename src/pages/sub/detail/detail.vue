@@ -35,7 +35,7 @@
             <text class="rating-value">{{ ratings.larrin.corrosion }}</text>
           </view>
           <view class="rating-item">
-            <text class="rating-label">韧性</text>
+            <text class="rating-label">韧性 <text class="tough-info" @click.stop="showToughnessNote">ⓘ</text></text>
             <text class="rating-value">≈{{ ratings.larrin.toughness }}</text>
           </view>
         </view>
@@ -52,16 +52,17 @@
             <text class="rating-value est">{{ ratings.estimated.corrosion }}</text>
           </view>
           <view class="rating-item">
-            <text class="rating-label">韧性</text>
+            <text class="rating-label">韧性 <text class="tough-info" @click.stop="showToughnessNote">ⓘ</text></text>
             <text class="rating-value est">≈{{ ratings.estimated.toughness }}</text>
           </view>
         </view>
       </view>
-      <view class="rating-action">
-        <view class="action-btn" @click="goChart">
-          <text class="action-icon">&#x1F4CA;</text>
-          <text class="action-label">对比和图表</text>
-        </view>
+    </view>
+
+    <view class="rating-action" v-if="ratings">
+      <view class="action-btn" @click="goChart">
+        <text class="action-icon">&#x1F4CA;</text>
+        <text class="action-label">对比和图表</text>
       </view>
     </view>
 
@@ -227,6 +228,14 @@ export default {
     goAbout() {
       uni.switchTab({ url: '/pages/about/about' })
     },
+    showToughnessNote() {
+      uni.showModal({
+        title: '关于韧性评分',
+        content: '韧性与热处理、硬度（Rc）和生产工艺（PM/ESR 等）关系较大，成分只是其中一个方面。因此韧性估算（≈）仅供参考。',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    },
     goElementInfo(index) {
       const el = this.compList[index] && this.compList[index].el
       if (el) uni.navigateTo({ url: '/pages/sub/element-info/element-info?element=' + el })
@@ -325,6 +334,11 @@ export default {
   margin-bottom: 6rpx;
 }
 
+.tough-info {
+  color: #666;
+  font-size: 22rpx;
+}
+
 .rating-value {
   color: #FFD700;
   font-size: 36rpx;
@@ -399,9 +413,10 @@ export default {
 }
 
 .rating-action {
-  margin-top: 8rpx;
+  margin-top: 24rpx;
+  margin-bottom: 40rpx;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .action-btn {
