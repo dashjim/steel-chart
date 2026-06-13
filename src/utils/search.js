@@ -29,6 +29,7 @@ export function getDefaultList() {
 
   const seen = new Set()
   const out = []
+  // 先放 Larrin 实测的知名钢材（按 Larrin 列表顺序）
   for (const r of larrinRatings) {
     const keys = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])].map(normName)
     let steel = null
@@ -38,6 +39,13 @@ export function getDefaultList() {
     if (steel && !seen.has(steel.id)) {
       seen.add(steel.id)
       out.push({ id: steel.id, name: steel.name, displayName: steel.name })
+    }
+  }
+  // 再接上其余所有钢材
+  for (const s of steels) {
+    if (!seen.has(s.id)) {
+      seen.add(s.id)
+      out.push({ id: s.id, name: s.name, displayName: s.name })
     }
   }
   defaultListCache = out
