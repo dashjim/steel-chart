@@ -1,9 +1,9 @@
 # Steel Chart 微信小程序
 
-刀具钢材化学成分数据库微信小程序。已上线。
+刀具钢材化学成分数据库微信小程序「钢材狂魔」（由「细节狂魔」创建）。已上线。
 
 GitHub: https://github.com/dashjim/steel-chart
-当前版本: v1.1.1 (待发布 v1.2.0)
+当前版本: v1.2.0
 AppID: wx5a77a7218df15b30
 
 ## 技术栈
@@ -32,6 +32,7 @@ steel-chart/
 │   │       │   ├── chart.vue
 │   │       │   └── select-steel.vue  # 搜索选择对比钢材
 │   │       ├── ladder/         # CATRA天梯图（图片可放大+轴含义说明）
+│   │       ├── tradeoff/       # 综合性能散点图（韧性vs保持性，Reddit整理图）
 │   │       ├── elements/       # 元素列表
 │   │       └── element-info/   # 元素说明（专业冶金学描述）
 │   ├── components/
@@ -104,6 +105,7 @@ JSON 通过 `import` 编译进 JS bundle。**不能用** `wx.getFileSystemManage
 - 同名称多钢材时，优先指向主名称包含搜索词的钢材
 - 搜索时无"别名"和"主名称"区分——用户视角每个名称都是独立条目
 - 搜索结果和收藏都存 displayName（用户看到的名称）
+- 空输入时展示默认列表（getDefaultList，详见下方设计决策）
 
 ### 图表对比功能
 - 详情页评分标题右侧有"对比"按钮（pill 样式）→ 进入图表页
@@ -125,6 +127,17 @@ JSON 通过 `import` 编译进 JS bundle。**不能用** `wx.getFileSystemManage
 ### 分包策略
 主包: 首页 + 收藏 + 关于（TabBar 页面）
 子包 `pages/sub/`: 详情 + 图表 + 选择钢材 + 元素（按需加载）
+
+### 图片放大查看（天梯图/散点图）
+- 内联用 `<image mode="widthFix">` 完整显示，点击调系统原生预览
+- **包内 /static/ 图片不能直接喂 previewImage**（一直转圈）→ 先 `uni.getImageInfo` 转本地临时路径，再 `uni.previewImage({urls:[res.path]})`
+- 系统原生预览支持双指缩放/拖动/长按保存（不要自己用 movable-view 做缩放，松手会缩回去）
+- 图表类图片（线条+文字）用 PNG 128 色调色板无损（~115KB），不用 JPEG（文字糊）
+
+### 搜索页空输入默认列表（getDefaultList）
+- 顺序: Larrin 粉末钢(isPM) → 其余 Larrin 钢材 → 全部其余钢材（共 1451 种全展示）
+- Larrin 名称匹配用**精确归一化**（去空格/连字符/点后比对），**禁用 includes**（短别名"60"会被"5160"误匹配）
+- Larrin 斜杠组合名（M390/20CV/204P）拆分后逐个查；同名多钢材优先主名匹配的
 
 ## 评分系统（进行中）
 
@@ -174,10 +187,13 @@ Larrin Thomas (knifesteelnerds.com) 的实测数据：
 - [x] CATRA 天梯图数据（60 种钢材，存于 catra-data.json）
 - [x] 评分区域加 ⓘ 图标跳转关于页查看模型说明
 - [x] 关于页标注数据来源和模型表现
+- [x] 韧性低置信度标注（值前加 ≈，韧性标签旁 ⓘ 弹窗说明受热处理/硬度/工艺影响；评分顺序 保持性→防锈→韧性，韧性最不准放最后）
+- [x] 综合性能散点图页（sub/tradeoff，韧性 vs 保持性，Reddit r/knifeclub 整理图）
+- [x] 详情页"对比和图表"按钮（📊，评分卡片下方独立块）
+- [x] 收藏页类型图标（📊 对比图表 / 成分收藏无图标）
 
 ### 下一步可做
 - [ ] 详情页加 CATRA 切割数据（TCC mm + 硬度 Rc）
-- [ ] 韧性预测标注"低置信度"
 - [ ] 基于 CATRA 数据的保持性天梯排名页
 
 ## 数据处理流程
@@ -211,6 +227,11 @@ node scripts/build-rating-model-v2.mjs
 11. **主包页面 import JSON 不能用 @/ alias** — 编译出错误路径 `pages/index/@/data/...`，必须用相对路径 `../../data/`
 12. **Array.sort() 会修改原数组** — 对比页 `steelIds.sort()` 导致 ids 和 names 索引不对应，必须 `.slice().sort()`
 13. **isPM 判断不全** — PM/CPM/MM/名称含CPM 都是粉末钢，之前只判断了前两种导致韧性预测偏低
+14. **uni-app 把 `>` 编译成 `&gt;`** — text 组件不反转义会显示乱码，用实体 `&#x203A;`(›)
+15. **previewImage 对包内图片转圈** — `/static/xxx` 路径不被识别，必须先 getImageInfo 转临时路径
+16. **movable-view 做图片缩放松手缩回** — 别自己做，直接用系统原生 previewImage
+17. **名称匹配禁用 includes** — 短别名"60"会被"5160"/"s60v"误包含，必须精确归一化匹配
+18. **真机横向溢出露白条** — 模拟器测不出；page/容器加 `overflow-x:hidden` + `width:100%`
 
 ## 设计文档
 
