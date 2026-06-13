@@ -1,7 +1,10 @@
 <template>
   <view class="page">
     <view class="landing">
-      <text class="app-title">钢材狂魔</text>
+      <view class="title-row">
+        <image class="app-logo" src="/static/logo-round.png" mode="aspectFit" />
+        <text class="app-title">钢材狂魔</text>
+      </view>
       <text class="app-subtitle">1451种钢材 · 34899个名称 · 性能评分</text>
       <view class="fake-search" @click="goSearch">
         <text class="search-icon">&#x1F50D;</text>
@@ -52,11 +55,22 @@ export default {
   padding: 0 60rpx;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.app-logo {
+  width: 64rpx;
+  height: 64rpx;
+  margin-right: 16rpx;
+}
+
 .app-title {
   color: #ffffff;
   font-size: 56rpx;
   font-weight: bold;
-  margin-bottom: 16rpx;
 }
 
 .app-subtitle {
