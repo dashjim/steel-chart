@@ -20,10 +20,19 @@
       </view>
     </view>
 
-    <view class="image-container">
-      <movable-area class="movable-area" scale-area>
+    <view class="image-container" @click="openZoom">
+      <image
+        class="tradeoff-image"
+        src="/static/tradeoff-chart.png"
+        mode="widthFix"
+      />
+      <text class="tap-hint">点击放大查看</text>
+    </view>
+
+    <view v-if="zoomed" class="zoom-mask" @click="closeZoom">
+      <movable-area class="zoom-area" scale-area>
         <movable-view
-          class="movable-view"
+          class="zoom-view"
           direction="all"
           :scale="true"
           scale-min="1"
@@ -31,24 +40,35 @@
           :scale-value="1"
         >
           <image
-            class="tradeoff-image"
-            src="/static/tradeoff-chart.jpg"
+            class="zoom-image"
+            src="/static/tradeoff-chart.png"
             mode="widthFix"
           />
         </movable-view>
       </movable-area>
-      <text class="tap-hint">双指缩放查看细节</text>
+      <text class="zoom-hint">双指缩放 · 点击空白处关闭</text>
     </view>
   </view>
 </template>
 
 <script>
 export default {
+  data() {
+    return { zoomed: false }
+  },
   onShareAppMessage() {
     return { title: '刀具钢材综合性能散点图', path: '/pages/sub/tradeoff/tradeoff' }
   },
   onShareTimeline() {
     return {}
+  },
+  methods: {
+    openZoom() {
+      this.zoomed = true
+    },
+    closeZoom() {
+      this.zoomed = false
+    }
   }
 }
 </script>
@@ -117,22 +137,6 @@ export default {
   position: relative;
 }
 
-.movable-area {
-  width: 100%;
-  height: 526rpx;
-  overflow: hidden;
-  background-color: #fff;
-  border-radius: 8rpx;
-}
-
-.movable-view {
-  width: 100%;
-  height: 526rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .tradeoff-image {
   width: 100%;
   border-radius: 8rpx;
@@ -144,5 +148,46 @@ export default {
   display: block;
   text-align: center;
   margin-top: 12rpx;
+}
+
+.zoom-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-area {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.zoom-view {
+  width: 750rpx;
+  height: 750rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-image {
+  width: 750rpx;
+}
+
+.zoom-hint {
+  position: fixed;
+  bottom: 60rpx;
+  left: 0;
+  width: 100vw;
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
 }
 </style>
