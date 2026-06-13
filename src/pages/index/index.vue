@@ -1,13 +1,14 @@
 <template>
   <view class="page">
     <view class="landing">
-      <text class="app-title">钢材成分图表</text>
+      <text class="app-title">钢材狂魔</text>
       <text class="app-subtitle">1451种钢材 · 34899个名称 · 性能评分</text>
       <view class="fake-search" @click="goSearch">
         <text class="search-icon">&#x1F50D;</text>
         <text class="search-placeholder">搜索钢材名称...</text>
       </view>
-      <text class="ladder-link" @click="goLadder">CATRA 保持性天梯图 ></text>
+      <text class="ladder-link" @click="goLadder">CATRA 保持性天梯图 &#x203A;</text>
+      <text class="ladder-link" @click="goTradeoff">综合性能散点图 &#x203A;</text>
     </view>
   </view>
 </template>
@@ -15,7 +16,7 @@
 <script>
 export default {
   onShareAppMessage() {
-    return { title: '钢材成分图表 - 刀具钢材数据库', path: '/pages/index/index' }
+    return { title: '钢材狂魔 - 刀具钢材数据库', path: '/pages/index/index' }
   },
   onShareTimeline() {
     return {}
@@ -26,6 +27,9 @@ export default {
     },
     goLadder() {
       uni.navigateTo({ url: '/pages/sub/ladder/ladder' })
+    },
+    goTradeoff() {
+      uni.navigateTo({ url: '/pages/sub/tradeoff/tradeoff' })
     }
   }
 }
@@ -86,5 +90,6 @@ export default {
 .ladder-link {
   color: #FFD700;
   font-size: 28rpx;
+  margin-bottom: 28rpx;
 }
 </style>

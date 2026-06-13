@@ -1,19 +1,22 @@
 <template>
   <view class="page">
     <view class="intro">
-      <text class="intro-title">CATRA 保持性天梯图</text>
+      <text class="intro-title">综合性能散点图</text>
       <text class="intro-desc">数据来源: Larrin Thomas (knifesteelnerds.com)</text>
-      <text class="intro-desc">测试条件: 15°刃角, 400目CBN研磨, 切割硅砂卡纸</text>
+      <text class="intro-desc">图表整理: Reddit r/knifeclub (u/phreakinpher)</text>
     </view>
 
     <view class="axis-info">
       <view class="axis-row">
-        <text class="axis-label">纵轴 TCC (mm)</text>
-        <text class="axis-desc">Total Cards Cut — 切割总毫米数，越高保持性越好</text>
+        <text class="axis-label">纵轴 Toughness</text>
+        <text class="axis-desc">韧性 — 越高越抗崩刃/折断</text>
       </view>
       <view class="axis-row">
-        <text class="axis-label">横轴 Hardness (Rc)</text>
-        <text class="axis-desc">洛氏硬度 — 测试时钢材的实际硬度</text>
+        <text class="axis-label">横轴 Edge Retention</text>
+        <text class="axis-desc">保持性 — 越高越耐磨、刃口持久</text>
+      </view>
+      <view class="axis-row">
+        <text class="axis-desc tradeoff-note">左上角 = 韧性优先，右下角 = 保持性优先。越靠右上方综合性能越强（如 MagnaCut、CPM-M4）。</text>
       </view>
     </view>
 
@@ -28,8 +31,8 @@
           :scale-value="1"
         >
           <image
-            class="ladder-image"
-            src="/static/catra-ladder.jpg"
+            class="tradeoff-image"
+            src="/static/tradeoff-chart.jpg"
             mode="widthFix"
           />
         </movable-view>
@@ -42,7 +45,7 @@
 <script>
 export default {
   onShareAppMessage() {
-    return { title: 'CATRA 保持性天梯图', path: '/pages/sub/ladder/ladder' }
+    return { title: '刀具钢材综合性能散点图', path: '/pages/sub/tradeoff/tradeoff' }
   },
   onShareTimeline() {
     return {}
@@ -106,13 +109,17 @@ export default {
   margin-top: 4rpx;
 }
 
+.tradeoff-note {
+  line-height: 1.6;
+}
+
 .image-container {
   position: relative;
 }
 
 .movable-area {
   width: 100%;
-  height: 520rpx;
+  height: 526rpx;
   overflow: hidden;
   background-color: #fff;
   border-radius: 8rpx;
@@ -120,13 +127,13 @@ export default {
 
 .movable-view {
   width: 100%;
-  height: 520rpx;
+  height: 526rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.ladder-image {
+.tradeoff-image {
   width: 100%;
   border-radius: 8rpx;
 }

@@ -22,6 +22,9 @@
       >{{ sorting ? '搜索中...' : '模糊' }}</text>
     </view>
     <scroll-view class="steel-list" scroll-y>
+      <view v-if="!keyword" class="hint-tip">
+        <text class="hint-text">常见刀具钢材（含 Larrin 实测评分）</text>
+      </view>
       <view
         v-for="(item, idx) in displayList"
         :key="idx"
@@ -43,6 +46,8 @@
 </template>
 
 <script>
+import { getAllSteels } from '@/utils/data'
+import larrinRatings from '@/data/larrin-ratings.json'
 import { search, fuzzySearch } from '@/utils/search'
 import { getFavorites, toggleFavorite } from '@/utils/favorites'
 
@@ -50,6 +55,7 @@ export default {
   data() {
     return {
       keyword: '',
+      defaultList: [],
       searchResults: [],
       searchFocused: true,
       sorting: false,
@@ -58,13 +64,22 @@ export default {
   },
   computed: {
     displayList() {
-      return this.searchResults
+      return this.keyword ? this.searchResults : this.defaultList
     }
   },
   onShow() {
     this.refreshFavorites()
   },
   onLoad() {
+    const larrinNames = larrinRatings.map(r => r.name.toLowerCase())
+    const all = getAllSteels()
+    const larrin = []
+    for (const s of all) {
+      const nameLower = s.name.toLowerCase()
+      const isLarrin = larrinNames.some(ln => ln === nameLower || ln.includes(nameLower) || (s.aliases && s.aliases.some(a => ln.includes(a.toLowerCase()))))
+      if (isLarrin) larrin.push({ id: s.id, name: s.name, displayName: s.name })
+    }
+    this.defaultList = larrin
     this.refreshFavorites()
   },
   methods: {
@@ -196,5 +211,14 @@ export default {
 .empty-text {
   color: #666;
   font-size: 28rpx;
+}
+
+.hint-tip {
+  padding: 20rpx 32rpx 12rpx;
+}
+
+.hint-text {
+  color: #666;
+  font-size: 24rpx;
 }
 </style>
