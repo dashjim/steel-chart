@@ -21,18 +21,11 @@
     <view class="section ratings-section" v-if="ratings">
       <view class="rating-header">
         <text class="section-label">性能评分 (0-10)</text>
-        <view class="rating-header-right">
-          <text class="compare-btn" @click="goChart">对比</text>
-          <text class="info-icon" @click="goAbout">ⓘ</text>
-        </view>
+        <text class="info-icon" @click="goAbout">ⓘ</text>
       </view>
       <view class="rating-group" v-if="ratings.larrin">
         <text class="rating-source">实测数据 (Larrin Thomas)</text>
         <view class="rating-row">
-          <view class="rating-item">
-            <text class="rating-label">韧性</text>
-            <text class="rating-value">{{ ratings.larrin.toughness }}</text>
-          </view>
           <view class="rating-item">
             <text class="rating-label">保持性</text>
             <text class="rating-value">{{ ratings.larrin.edgeRetention }}</text>
@@ -41,15 +34,15 @@
             <text class="rating-label">防锈</text>
             <text class="rating-value">{{ ratings.larrin.corrosion }}</text>
           </view>
+          <view class="rating-item">
+            <text class="rating-label">韧性</text>
+            <text class="rating-value">≈{{ ratings.larrin.toughness }}</text>
+          </view>
         </view>
       </view>
       <view class="rating-group">
         <text class="rating-source">{{ ratings.larrin ? '性能估算' : '性能估算 (无实测数据)' }}</text>
         <view class="rating-row">
-          <view class="rating-item">
-            <text class="rating-label">韧性</text>
-            <text class="rating-value est">{{ ratings.estimated.toughness }}</text>
-          </view>
           <view class="rating-item">
             <text class="rating-label">保持性</text>
             <text class="rating-value est">{{ ratings.estimated.edgeRetention }}</text>
@@ -57,6 +50,10 @@
           <view class="rating-item">
             <text class="rating-label">防锈</text>
             <text class="rating-value est">{{ ratings.estimated.corrosion }}</text>
+          </view>
+          <view class="rating-item">
+            <text class="rating-label">韧性</text>
+            <text class="rating-value est">≈{{ ratings.estimated.toughness }}</text>
           </view>
         </view>
       </view>
@@ -96,6 +93,12 @@
       </view>
     </view>
 
+    <view class="action-bar">
+      <view class="action-btn" @click="goChart">
+        <text class="action-icon">&#x1F4CA;</text>
+        <text class="action-label">查看图表和对比</text>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -289,21 +292,6 @@ export default {
   justify-content: space-between;
 }
 
-.rating-header-right {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.compare-btn {
-  color: #ffffff;
-  font-size: 24rpx;
-  padding: 6rpx 20rpx;
-  background-color: #333;
-  border-radius: 20rpx;
-  border: 1rpx solid #555;
-}
-
 .info-icon {
   color: #666;
   font-size: 32rpx;
@@ -408,6 +396,31 @@ export default {
   color: #FFA500;
   font-size: 28rpx;
   text-decoration: underline;
+}
+
+.action-bar {
+  margin-top: 60rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 40rpx;
+  background-color: #1a1a1a;
+  border-radius: 40rpx;
+  border: 1rpx solid #333;
+}
+
+.action-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.action-label {
+  color: #ffffff;
+  font-size: 28rpx;
 }
 
 </style>
