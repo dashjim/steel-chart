@@ -1,7 +1,48 @@
 import { getAllSteels } from './data'
+import larrinRatings from '@/data/larrin-ratings.json'
 
 let allNames = null
 let steelPrimaryName = null
+let defaultListCache = null
+
+function normName(s) {
+  return s.toLowerCase().replace(/[\s\-_.]/g, '')
+}
+
+// 按 Larrin 实测列表顺序返回知名钢材，作为搜索页空输入时的默认展示
+export function getDefaultList() {
+  if (defaultListCache) return defaultListCache
+  const steels = getAllSteels()
+  // 归一化名称 -> 钢材列表
+  const map = new Map()
+  for (const s of steels) {
+    for (const n of [s.name, ...(s.aliases || [])]) {
+      const k = normName(n)
+      if (!map.has(k)) map.set(k, [])
+      map.get(k).push(s)
+    }
+  }
+  const pick = (arr, key) =>
+    arr.find(s => normName(s.name) === key) ||
+    arr.find(s => normName(s.name).includes(key)) ||
+    arr[0]
+
+  const seen = new Set()
+  const out = []
+  for (const r of larrinRatings) {
+    const keys = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])].map(normName)
+    let steel = null
+    for (const k of keys) {
+      if (map.has(k)) { steel = pick(map.get(k), k); break }
+    }
+    if (steel && !seen.has(steel.id)) {
+      seen.add(steel.id)
+      out.push({ id: steel.id, name: steel.name, displayName: steel.name })
+    }
+  }
+  defaultListCache = out
+  return out
+}
 
 function ensureNames() {
   if (allNames) return

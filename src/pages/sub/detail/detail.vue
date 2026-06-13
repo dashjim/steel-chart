@@ -96,7 +96,7 @@
     <view class="action-bar">
       <view class="action-btn" @click="goChart">
         <text class="action-icon">&#x1F4CA;</text>
-        <text class="action-label">查看图表和对比</text>
+        <text class="action-label">对比和图表</text>
       </view>
     </view>
   </view>

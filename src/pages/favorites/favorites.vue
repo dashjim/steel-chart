@@ -3,6 +3,7 @@
     <view v-if="list.length === 0" class="empty">暂无收藏</view>
     <view v-else class="list">
       <view class="item" v-for="item in list" :key="item.id" @tap="goDetail(item)">
+        <text class="type-icon">{{ item.compareData ? '\u{1F4CA}' : '\u{1F9EA}' }}</text>
         <text class="item-name">{{ item.displayName || item.id }}</text>
         <text class="star" @tap.stop="removeFavorite(item)">★</text>
       </view>
@@ -75,9 +76,15 @@ export default {
   border-bottom: 1rpx solid #333333;
 }
 
+.type-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+}
+
 .item-name {
   color: #ffffff;
   font-size: 30rpx;
+  flex: 1;
 }
 
 .star {

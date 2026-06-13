@@ -46,9 +46,7 @@
 </template>
 
 <script>
-import { getAllSteels } from '@/utils/data'
-import larrinRatings from '@/data/larrin-ratings.json'
-import { search, fuzzySearch } from '@/utils/search'
+import { search, fuzzySearch, getDefaultList } from '@/utils/search'
 import { getFavorites, toggleFavorite } from '@/utils/favorites'
 
 export default {
@@ -71,15 +69,7 @@ export default {
     this.refreshFavorites()
   },
   onLoad() {
-    const larrinNames = larrinRatings.map(r => r.name.toLowerCase())
-    const all = getAllSteels()
-    const larrin = []
-    for (const s of all) {
-      const nameLower = s.name.toLowerCase()
-      const isLarrin = larrinNames.some(ln => ln === nameLower || ln.includes(nameLower) || (s.aliases && s.aliases.some(a => ln.includes(a.toLowerCase()))))
-      if (isLarrin) larrin.push({ id: s.id, name: s.name, displayName: s.name })
-    }
-    this.defaultList = larrin
+    this.defaultList = getDefaultList()
     this.refreshFavorites()
   },
   methods: {
