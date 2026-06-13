@@ -24,11 +24,57 @@
       <view class="stat-item">成分数据: zknives.com</view>
       <view class="stat-item">性能评分: knifesteelnerds.com (Larrin Thomas)</view>
     </view>
+
+    <view class="section-title">更新日志</view>
+    <view class="release" v-for="(rel, idx) in releases" :key="idx">
+      <view class="release-head">
+        <text class="release-ver">v{{ rel.version }}</text>
+        <text class="release-date">{{ rel.date }}</text>
+      </view>
+      <text class="release-item" v-for="(line, li) in rel.items" :key="li">· {{ line }}</text>
+    </view>
   </view>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      releases: [
+        {
+          version: '1.2.0',
+          date: '2026-06-13',
+          items: [
+            '小程序更名「钢材狂魔」，全新首页',
+            '新增综合性能散点图（韧性 vs 保持性）',
+            '韧性预测标注低置信度（≈），评分重新排序',
+            '图片支持系统原生缩放查看',
+            '收藏页区分对比图表与成分收藏'
+          ]
+        },
+        {
+          version: '1.1.0',
+          date: '2026-06-08',
+          items: [
+            '新增性能评分（韧性/保持性/防锈）与预测模型',
+            '成分对比图表大升级，最多 5 种钢材同屏对比',
+            '新增 CATRA 保持性天梯图',
+            '首页改为搜索式，优先展示知名钢材'
+          ]
+        },
+        {
+          version: '1.0.0',
+          date: '2026-05-25',
+          items: [
+            '刀具钢材成分数据库上线，收录 1451 种钢材',
+            '支持成分查询、中文描述、元素说明',
+            '34899 个名称/别名搜索，支持模糊匹配',
+            '收藏、分享功能'
+          ]
+        }
+      ]
+    }
+  },
   onShareAppMessage() {
     return { title: "钢材狂魔 - 1451种刀具钢材数据库", path: "/pages/index/index" }
   },
@@ -100,5 +146,34 @@ export default {
   color: #888;
   line-height: 1.5;
   margin-bottom: 40rpx;
+}
+
+.release {
+  margin-bottom: 28rpx;
+}
+
+.release-head {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8rpx;
+}
+
+.release-ver {
+  font-size: 28rpx;
+  color: #FFD700;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.release-date {
+  font-size: 22rpx;
+  color: #888;
+}
+
+.release-item {
+  display: block;
+  font-size: 25rpx;
+  color: #bbbbbb;
+  line-height: 1.7;
 }
 </style>

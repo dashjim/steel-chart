@@ -182,12 +182,20 @@ export default {
 }
 </script>
 
+<style>
+page {
+  overflow-x: hidden;
+}
+</style>
+
 <style scoped>
 .chart-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
   background-color: #000000;
+  overflow-x: hidden;
 }
 
 .header {
@@ -219,6 +227,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  width: 100%;
 }
 
 .empty-hint {
@@ -237,6 +247,9 @@ export default {
   padding: 16rpx 30rpx;
   background-color: #111111;
   border-top: 1rpx solid #333333;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .legend-item {
@@ -245,6 +258,8 @@ export default {
   padding: 16rpx 0;
   border-bottom: 1rpx solid #222;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .legend-left {
