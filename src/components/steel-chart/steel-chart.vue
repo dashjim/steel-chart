@@ -31,15 +31,14 @@ export default {
       canvasWidth: 350,
       canvasHeight: 400,
       ctx: null,
-      canvasNode: null,
       dpr: 1
     }
   },
   watch: {
-    steels: { handler() { this.render() }, deep: true },
-    mode() { this.render() },
-    elements: { handler() { this.render() }, deep: true },
-    yMax() { this.render() }
+    steels: { handler() { this.draw() }, deep: true },
+    mode() { this.draw() },
+    elements: { handler() { this.draw() }, deep: true },
+    yMax() { this.draw() }
   },
   mounted() {
     this.$nextTick(() => {
@@ -47,23 +46,12 @@ export default {
     })
   },
   methods: {
-    // 实测图表容器(.chart-area)的可用高度，避免固定高度被图例挤压后裁切 X 轴标签
-    measureHeight(cb) {
-      const sysInfo = uni.getSystemInfoSync()
-      this.canvasWidth = sysInfo.windowWidth
-      uni.createSelectorQuery().select('.chart-area').boundingClientRect((rect) => {
-        if (rect && rect.height > 0) {
-          this.canvasHeight = Math.floor(rect.height)
-        } else {
-          this.canvasHeight = Math.floor(sysInfo.windowHeight * 0.65)
-        }
-        cb && cb()
-      }).exec()
-    },
-
     initCanvas() {
       const sysInfo = uni.getSystemInfoSync()
       this.dpr = sysInfo.pixelRatio || 2
+      this.canvasWidth = sysInfo.windowWidth
+      // 图表区高度: windowHeight × 0.55 (留更多空间给图例和toolbar，避免对比≥3种时X轴标签被裁)
+      this.canvasHeight = Math.floor(sysInfo.windowHeight * 0.55)
 
       // #ifdef MP-WEIXIN
       const query = uni.createSelectorQuery().in(this)
@@ -71,36 +59,20 @@ export default {
         .fields({ node: true, size: true })
         .exec((res) => {
           if (res && res[0] && res[0].node) {
-            this.canvasNode = res[0].node
-            this.ctx = this.canvasNode.getContext('2d')
-            this.render()
+            const canvas = res[0].node
+            this.ctx = canvas.getContext('2d')
+            canvas.width = this.canvasWidth * this.dpr
+            canvas.height = this.canvasHeight * this.dpr
+            this.ctx.scale(this.dpr, this.dpr)
+            this.draw()
           }
         })
       // #endif
 
       // #ifndef MP-WEIXIN
-      this.canvasWidth = sysInfo.windowWidth
-      this.canvasHeight = Math.floor(sysInfo.windowHeight * 0.65)
       this.ctx = uni.createCanvasContext(this.canvasId, this)
       this.draw()
       // #endif
-    },
-
-    // 测量高度 → 重设画布缓冲尺寸 → 重绘（nextTick 确保父组件图例 DOM 已更新）
-    render() {
-      if (!this.ctx) return
-      this.$nextTick(() => {
-        this.measureHeight(() => {
-          // #ifdef MP-WEIXIN
-          if (this.canvasNode) {
-            this.canvasNode.width = this.canvasWidth * this.dpr
-            this.canvasNode.height = this.canvasHeight * this.dpr
-            this.ctx.scale(this.dpr, this.dpr)
-          }
-          // #endif
-          this.draw()
-        })
-      })
     },
 
     getComposition(steel) {

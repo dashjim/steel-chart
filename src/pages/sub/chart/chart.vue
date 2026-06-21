@@ -243,7 +243,7 @@ page {
 }
 
 .legend {
-  max-height: 400rpx;
+  max-height: 360rpx;
   padding: 16rpx 30rpx;
   background-color: #111111;
   border-top: 1rpx solid #333333;

@@ -2,9 +2,9 @@
 <template>
   <view class="page">
     <view class="app-name">钢材狂魔</view>
-    <view class="version">版本 1.2.0</view>
-    <view class="desc">「钢材狂魔」由「细节狂魔」创建，欢迎大家找他反馈问题。这个小程序会越来越丰富，从钢材化学成分逐步拓展到更多钢材相关的内容。</view>
+    <view class="version">版本 1.2.1</view>
     <view class="desc">小程序中的数据由「细节狂魔」从公开数据收集整理。目前收录 1451 种钢材、34899 个名称（含各国标准别名），帮助您了解各种钢材的元素组成及其对性能的影响。</view>
+    <view class="desc">「钢材狂魔」由「细节狂魔」创建，欢迎大家找他反馈问题。这个小程序会越来越丰富，从钢材化学成分逐步拓展到更多钢材相关的内容。</view>
     <view class="stats">
       <view class="stat-item">钢材种类: 1451</view>
       <view class="stat-item">名称/别名: 34899</view>
@@ -41,6 +41,17 @@ export default {
   data() {
     return {
       releases: [
+        {
+          version: '1.2.1',
+          date: '2026-06-21',
+          items: [
+            '新增「Larrin Thomas 评级」页：61 种钢材分类筛选 + 多维度排序',
+            '修复对比图表 ≥3 种钢材时 X 轴标签被裁',
+            '首页内容上移，分享缩略图能看到核心内容',
+            '图例可读性优化（橙色元素名 + 提亮数值）',
+            '关于页加更新日志'
+          ]
+        },
         {
           version: '1.2.0',
           date: '2026-06-13',
