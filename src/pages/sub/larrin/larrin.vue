@@ -16,7 +16,7 @@
       >{{ opt.label }}<text class="tab-count" v-if="opt.count != null"> {{ opt.count }}</text></text>
     </view>
 
-    <view class="filter-label">排序</view>
+    <view class="filter-label">排序 <text class="filter-info" @click="showSortHelp">ⓘ</text></view>
     <view class="sort-tabs">
       <text
         v-for="(opt, i) in sortOpts"
@@ -136,6 +136,14 @@ export default {
     setCat(key) {
       this.cat = key
     },
+    showSortHelp() {
+      uni.showModal({
+        title: '排序规则说明',
+        content: '默认: Larrin 文章原始顺序\n保持性 / 防锈 / 韧性: 按单项分数从高到低\n综合: 三项分数相加(0~30 分)从高到低，是简单求和，未做加权\n\n注: 综合分仅供参考，实际选钢应结合用途权衡（切硬物看保持性，户外看防锈，斧/砍刀看韧性）。',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    },
     goDetail(idx) {
       const item = this.sortedList[idx]
       const target = this.idMap[item.name]
@@ -183,6 +191,12 @@ export default {
   font-size: 22rpx;
   margin-bottom: 8rpx;
   margin-top: 4rpx;
+}
+
+.filter-info {
+  color: #888;
+  font-size: 22rpx;
+  margin-left: 6rpx;
 }
 
 .sort-tabs {
