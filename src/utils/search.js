@@ -5,7 +5,7 @@ let allNames = null
 let steelPrimaryName = null
 let defaultListCache = null
 
-function normName(s) {
+export function normName(s) {
   return s.toLowerCase().replace(/[\s\-_.]/g, '')
 }
 

@@ -1,0 +1,293 @@
+<template>
+  <view class="page">
+    <view class="intro">
+      <text class="intro-title">Larrin Thomas 评级</text>
+      <text class="intro-desc">61 种刀具钢材的实测评分（CATRA 切割 / Charpy 冲击 / 盐雾腐蚀）</text>
+      <text class="intro-desc">数据来源: knifesteelnerds.com</text>
+    </view>
+
+    <view class="filter-label">分类</view>
+    <view class="sort-tabs">
+      <text
+        v-for="(opt, i) in catOpts"
+        :key="'c'+i"
+        :class="['sort-tab', cat === opt.key ? 'active' : '']"
+        @click="setCat(opt.key)"
+      >{{ opt.label }}<text class="tab-count" v-if="opt.count != null"> {{ opt.count }}</text></text>
+    </view>
+
+    <view class="filter-label">排序</view>
+    <view class="sort-tabs">
+      <text
+        v-for="(opt, i) in sortOpts"
+        :key="'s'+i"
+        :class="['sort-tab', sortKey === opt.key ? 'active' : '']"
+        @click="setSort(opt.key)"
+      >{{ opt.label }}</text>
+    </view>
+
+    <view class="header-row">
+      <text class="col-name">钢材</text>
+      <text class="col-score">保持性</text>
+      <text class="col-score">防锈</text>
+      <text class="col-score">韧性</text>
+    </view>
+
+    <view class="list">
+      <view
+        class="row"
+        v-for="(item, idx) in sortedList"
+        :key="item.name"
+        @click="goDetail(idx)"
+      >
+        <text class="row-name">{{ item.name }}</text>
+        <view class="score-cell">
+          <text class="score-val">{{ item.edgeRetention }}</text>
+          <view class="score-bar"><view class="score-fill er" :style="{width: (item.edgeRetention*10)+'%'}"></view></view>
+        </view>
+        <view class="score-cell">
+          <text class="score-val">{{ item.corrosion }}</text>
+          <view class="score-bar"><view class="score-fill co" :style="{width: (item.corrosion*10)+'%'}"></view></view>
+        </view>
+        <view class="score-cell">
+          <text class="score-val">≈{{ item.toughness }}</text>
+          <view class="score-bar"><view class="score-fill to" :style="{width: (item.toughness*10)+'%'}"></view></view>
+        </view>
+      </view>
+    </view>
+
+    <text class="footer-note">注: 韧性受热处理/工艺影响大，标 ≈ 表示低置信度。点击钢材跳转详情。</text>
+  </view>
+</template>
+
+<script>
+import larrinRatings from '@/data/larrin-ratings.json'
+import { getAllSteels } from '@/utils/data.js'
+import { normName } from '@/utils/search.js'
+
+export default {
+  data() {
+    return {
+      sortKey: 'default',
+      cat: 'all',
+      sortOpts: [
+        { key: 'default', label: '默认' },
+        { key: 'edgeRetention', label: '保持性' },
+        { key: 'corrosion', label: '防锈' },
+        { key: 'toughness', label: '韧性' },
+        { key: 'combined', label: '综合' }
+      ],
+      idMap: {}
+    }
+  },
+  computed: {
+    catOpts() {
+      const counts = { all: larrinRatings.length, 'low-alloy': 0, 'high-alloy': 0, stainless: 0 }
+      for (const r of larrinRatings) if (counts[r.category] != null) counts[r.category]++
+      return [
+        { key: 'all', label: '全部', count: counts.all },
+        { key: 'low-alloy', label: '碳钢/低合金', count: counts['low-alloy'] },
+        { key: 'high-alloy', label: '高合金', count: counts['high-alloy'] },
+        { key: 'stainless', label: '不锈钢', count: counts.stainless }
+      ]
+    },
+    sortedList() {
+      let list = larrinRatings.map(r => ({
+        ...r,
+        combined: (r.edgeRetention || 0) + (r.corrosion || 0) + (r.toughness || 0)
+      }))
+      if (this.cat !== 'all') list = list.filter(r => r.category === this.cat)
+      if (this.sortKey === 'default') return list
+      return list.slice().sort((a, b) => (b[this.sortKey] || 0) - (a[this.sortKey] || 0))
+    }
+  },
+  onShareAppMessage() {
+    return { title: '61 种刀具钢材的 Larrin Thomas 评级', path: '/pages/sub/larrin/larrin' }
+  },
+  onShareTimeline() {
+    return {}
+  },
+  onLoad() {
+    // 预建 Larrin 名 → 钢材id 映射，方便点击跳转
+    const steels = getAllSteels()
+    const nameToId = new Map()
+    for (const s of steels) {
+      for (const n of [s.name, ...(s.aliases || [])]) {
+        const k = normName(n)
+        if (!nameToId.has(k)) nameToId.set(k, { id: s.id, isPrimary: normName(s.name) === k })
+        else if (!nameToId.get(k).isPrimary && normName(s.name) === k) {
+          nameToId.set(k, { id: s.id, isPrimary: true })
+        }
+      }
+    }
+    const map = {}
+    for (const r of larrinRatings) {
+      const keys = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])].map(normName)
+      for (const k of keys) {
+        if (nameToId.has(k)) { map[r.name] = { id: nameToId.get(k).id, displayName: r.name }; break }
+      }
+    }
+    this.idMap = map
+  },
+  methods: {
+    setSort(key) {
+      this.sortKey = key
+    },
+    setCat(key) {
+      this.cat = key
+    },
+    goDetail(idx) {
+      const item = this.sortedList[idx]
+      const target = this.idMap[item.name]
+      if (!target) {
+        uni.showToast({ title: '未找到该钢材', icon: 'none' })
+        return
+      }
+      uni.navigateTo({
+        url: '/pages/sub/detail/detail?id=' + target.id + '&name=' + encodeURIComponent(target.displayName)
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+.page {
+  min-height: 100vh;
+  background-color: #000000;
+  padding: 30rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.intro {
+  margin-bottom: 24rpx;
+}
+
+.intro-title {
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.intro-desc {
+  color: #888;
+  font-size: 24rpx;
+  display: block;
+  line-height: 1.6;
+}
+
+.filter-label {
+  color: #666;
+  font-size: 22rpx;
+  margin-bottom: 8rpx;
+  margin-top: 4rpx;
+}
+
+.sort-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.tab-count {
+  color: inherit;
+  opacity: 0.6;
+}
+
+.sort-tab {
+  color: #888;
+  font-size: 24rpx;
+  padding: 8rpx 22rpx;
+  background-color: #1a1a1a;
+  border-radius: 24rpx;
+  border: 1rpx solid #333;
+}
+
+.sort-tab.active {
+  color: #000;
+  background-color: #FFD700;
+  border-color: #FFD700;
+  font-weight: bold;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 8rpx;
+  border-bottom: 1rpx solid #333;
+}
+
+.col-name {
+  flex: 1.6;
+  color: #999;
+  font-size: 22rpx;
+}
+
+.col-score {
+  flex: 1;
+  color: #999;
+  font-size: 22rpx;
+  text-align: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 8rpx;
+  border-bottom: 1rpx solid #1f1f1f;
+}
+
+.row-name {
+  flex: 1.6;
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: bold;
+}
+
+.score-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-val {
+  color: #FFD700;
+  font-size: 24rpx;
+  margin-bottom: 6rpx;
+}
+
+.score-bar {
+  width: 90%;
+  height: 6rpx;
+  background-color: #1a1a1a;
+  border-radius: 3rpx;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  border-radius: 3rpx;
+}
+
+.score-fill.er { background-color: #4A90D9; }
+.score-fill.co { background-color: #27AE60; }
+.score-fill.to { background-color: #E67E22; }
+
+.footer-note {
+  display: block;
+  color: #666;
+  font-size: 22rpx;
+  line-height: 1.6;
+  margin-top: 24rpx;
+  padding-bottom: 30rpx;
+}
+</style>

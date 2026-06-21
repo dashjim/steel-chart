@@ -10,6 +10,7 @@
         <text class="search-icon">&#x1F50D;</text>
         <text class="search-placeholder">搜索钢材名称...</text>
       </view>
+      <text class="ladder-link" @click="goLarrin">61 种钢材的 Larrin 评级 &#x203A;</text>
       <text class="ladder-link" @click="goLadder">CATRA 保持性天梯图 &#x203A;</text>
       <text class="ladder-link" @click="goTradeoff">综合性能散点图 &#x203A;</text>
     </view>
@@ -33,6 +34,9 @@ export default {
     },
     goTradeoff() {
       uni.navigateTo({ url: '/pages/sub/tradeoff/tradeoff' })
+    },
+    goLarrin() {
+      uni.navigateTo({ url: '/pages/sub/larrin/larrin' })
     }
   }
 }
