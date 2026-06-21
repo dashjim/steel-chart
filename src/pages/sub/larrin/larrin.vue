@@ -261,7 +261,7 @@ export default {
 
 .row-name {
   flex: 1.6;
-  color: #ffffff;
+  color: #FFD700;
   font-size: 26rpx;
   font-weight: bold;
 }
@@ -274,7 +274,7 @@ export default {
 }
 
 .score-val {
-  color: #FFD700;
+  color: #ffffff;
   font-size: 24rpx;
   margin-bottom: 6rpx;
 }
