@@ -2,7 +2,7 @@
 <template>
   <view class="page">
     <view class="app-name">钢材狂魔</view>
-    <view class="version">版本 1.3.0</view>
+    <view class="version">版本 1.3.1</view>
     <view class="desc">小程序中的数据由「细节狂魔」从公开数据收集整理。目前收录 4500+ 钢号、34899 个名称（含各国标准别名），帮助您了解各种钢材的元素组成及其对性能的影响。</view>
     <view class="stats">
       <view class="stat-item">主名钢材: 1451 种</view>
@@ -41,6 +41,14 @@ export default {
   data() {
     return {
       releases: [
+        {
+          version: '1.3.1',
+          date: '2026-06-28',
+          items: [
+            '修正 23 条高速钢的 V/W 含量错位（数据源系统性错误，如 ASP23/ASP2030/M7 等）',
+            '修正后与 Erasteel 等厂商官方数据完全吻合'
+          ]
+        },
         {
           version: '1.3.0',
           date: '2026-06-28',
