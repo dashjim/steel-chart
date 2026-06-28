@@ -2,7 +2,7 @@
 <template>
   <view class="page">
     <view class="app-name">钢材狂魔</view>
-    <view class="version">版本 1.2.2</view>
+    <view class="version">版本 1.3.0</view>
     <view class="desc">小程序中的数据由「细节狂魔」从公开数据收集整理。目前收录 4500+ 钢号、34899 个名称（含各国标准别名），帮助您了解各种钢材的元素组成及其对性能的影响。</view>
     <view class="stats">
       <view class="stat-item">主名钢材: 1451 种</view>
@@ -41,6 +41,15 @@ export default {
   data() {
     return {
       releases: [
+        {
+          version: '1.3.0',
+          date: '2026-06-28',
+          items: [
+            '别名独立成分上线：搜「Assab88」等 492 个别名时显示该别名的真实成分（来自 zknives 钢材页面 OCR 提取）',
+            '例如 Assab88 现显示 Mo 2.5% / V 0.5%（Assab/SE 真实数据），而非主名 Cr8Mo1VSi 国标的 Mo 1.8-2.2% / V 0.2-0.5%',
+            '数据双跑校验 + Opus 4.8 复查 + W↔N 字母误识修正，492 条全部人工或机器闭环'
+          ]
+        },
         {
           version: '1.2.2',
           date: '2026-06-28',
