@@ -3,3 +3,7 @@ dist/
 .DS_Store
 src/static/data/descriptions-progress.json
 src/static/data/descriptions-zh-progress.json
+src/data/alias-metadata-progress.json
+src/data/alias-desc-zh-progress.json
+src/data/alias-metadata-failures.json
+src/data/aliases-to-translate.json

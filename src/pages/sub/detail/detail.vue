@@ -2,6 +2,7 @@
   <view class="page">
     <view class="header">
       <text class="title">{{ steelName }}</text>
+      <text class="fav-star" :class="{ favorited: isFav }" @click="toggleFav">{{ isFav ? '★' : '☆' }}</text>
     </view>
 
     <view class="section" v-if="compList.length">
@@ -107,6 +108,9 @@
 import { getSteelById, getAllSteels } from '@/utils/data.js'
 import { search } from '@/utils/search.js'
 import { getRatings } from '@/utils/ratings.js'
+import { toggleFavorite, isFavorite } from '@/utils/favorites.js'
+import aliasMetadata from '@/data/alias-metadata.json'
+import aliasDescZh from '@/data/alias-desc-zh.json'
 
 const EL_NAMES = {
   C: '碳', Cr: '铬', Mo: '钼', V: '钒', W: '钨',
@@ -126,7 +130,8 @@ export default {
       ratings: null,
       descParts: [],
       compList: [],
-      aliasList: []
+      aliasList: [],
+      isFav: false
     }
   },
   onShareAppMessage() {
@@ -140,24 +145,43 @@ export default {
     const steel = getSteelById(this.id)
     if (steel) {
       this.steelName = options.name ? decodeURIComponent(options.name) : steel.name
-      this.steelMaker = steel.maker || ''
       const TECH_NAMES = { PM: '粉末冶金(PM)', CPM: '坩埚粉末冶金(CPM)', MM: 'Micro-Melt', ESR: '电渣重熔(ESR)', SF: '喷射成形(SF)', VIM: '真空感应熔炼(VIM)' }
       this.steelTech = steel.tech ? (TECH_NAMES[steel.tech] || steel.tech) : ''
       this.steelStandard = steel.standard || ''
-      this.steelCountry = steel.country || ''
       this.ratings = getRatings(steel)
-      this.descParts = this.parseDescription(steel.desc || '')
+
+      // 别名访问时，用 alias-metadata 覆盖 country/maker/desc（仅当该名是别名且有元数据）
+      const isAlias = this.steelName !== steel.name
+      const aliasMeta = isAlias ? aliasMetadata[this.steelName] : null
+      this.steelMaker = (aliasMeta && aliasMeta.maker) || steel.maker || ''
+      this.steelCountry = (aliasMeta && aliasMeta.country) || steel.country || ''
+      // 描述: 优先用别名的中文翻译, 否则用主名描述
+      const aliasZh = isAlias ? aliasDescZh[this.steelName] : null
+      const descToShow = aliasZh || (steel.desc || '')
+      this.descParts = this.parseDescription(descToShow)
       if (steel.composition) {
-        this.compList = Object.entries(steel.composition).map(([el, vals]) => ({
+        // 排序: C 永远第一, 其他按最大含量降序
+        const entries = Object.entries(steel.composition).map(([el, vals]) => ({
           el,
           zhName: EL_NAMES[el] || el,
-          value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`
+          value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`,
+          sortVal: vals.length === 2 ? vals[1] : vals[0]
         }))
+        entries.sort((a, b) => {
+          if (a.el === 'C') return -1
+          if (b.el === 'C') return 1
+          return (b.sortVal || 0) - (a.sortVal || 0)
+        })
+        this.compList = entries.map(({el, zhName, value}) => ({el, zhName, value}))
       }
       if (steel.aliases) {
         this.aliasList = steel.aliases.slice()
       }
+      this.isFav = isFavorite(parseInt(this.id))
     }
+  },
+  onShow() {
+    if (this.id) this.isFav = isFavorite(parseInt(this.id))
   },
   methods: {
     parseDescription(desc) {
@@ -228,6 +252,10 @@ export default {
     goAbout() {
       uni.switchTab({ url: '/pages/about/about' })
     },
+    toggleFav() {
+      toggleFavorite(parseInt(this.id), this.steelName)
+      this.isFav = isFavorite(parseInt(this.id))
+    },
     showToughnessNote() {
       uni.showModal({
         title: '关于韧性评分',
@@ -267,6 +295,7 @@ export default {
 }
 
 .header {
+  position: relative;
   text-align: center;
   margin-bottom: 40rpx;
 }
@@ -275,6 +304,20 @@ export default {
   color: #ffffff;
   font-size: 40rpx;
   font-weight: bold;
+}
+
+.fav-star {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 48rpx;
+  color: #555;
+  padding: 4rpx 16rpx;
+  line-height: 1;
+}
+
+.fav-star.favorited {
+  color: #FFD700;
 }
 
 .section {

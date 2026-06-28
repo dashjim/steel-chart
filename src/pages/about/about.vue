@@ -2,12 +2,13 @@
 <template>
   <view class="page">
     <view class="app-name">钢材狂魔</view>
-    <view class="version">版本 1.2.1</view>
-    <view class="desc">小程序中的数据由「细节狂魔」从公开数据收集整理。目前收录 1451 种钢材、34899 个名称（含各国标准别名），帮助您了解各种钢材的元素组成及其对性能的影响。</view>
+    <view class="version">版本 1.2.2</view>
+    <view class="desc">小程序中的数据由「细节狂魔」从公开数据收集整理。目前收录 4500+ 钢号、34899 个名称（含各国标准别名），帮助您了解各种钢材的元素组成及其对性能的影响。</view>
     <view class="desc">「钢材狂魔」由「细节狂魔」创建，欢迎大家找他反馈问题。这个小程序会越来越丰富，从钢材化学成分逐步拓展到更多钢材相关的内容。</view>
     <view class="stats">
-      <view class="stat-item">钢材种类: 1451</view>
-      <view class="stat-item">名称/别名: 34899</view>
+      <view class="stat-item">主名钢材: 1451 种</view>
+      <view class="stat-item">独立钢号: 4500+（含别名独立详情）</view>
+      <view class="stat-item">名称/别名总数: 34899</view>
       <view class="stat-item">覆盖标准: AISI, DIN, GB, JIS, GOST 等</view>
       <view class="stat-item">实测评分: 61 种（Larrin Thomas）</view>
     </view>
@@ -41,6 +42,15 @@ export default {
   data() {
     return {
       releases: [
+        {
+          version: '1.2.2',
+          date: '2026-06-28',
+          items: [
+            '别名信息独立化：搜「Assab88」等别名时显示正确的国家(SE)、厂商(Bohler-Uddeholm)和专属描述',
+            '从 zknives 抓取 3102 个别名独立元数据，纠正 2398 个错配的国家/厂商字段',
+            '492 个具有独立描述的别名翻译成中文（Larrin/MagnaCut/Sleipner 等）'
+          ]
+        },
         {
           version: '1.2.1',
           date: '2026-06-21',
