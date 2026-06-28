@@ -5,7 +5,7 @@
         <image class="app-logo" src="/static/logo-round.png" mode="aspectFit" />
         <text class="app-title">钢材狂魔</text>
       </view>
-      <text class="app-subtitle">1451种钢材 · 34899个名称 · 性能评分</text>
+      <text class="app-subtitle">4500+钢号 · 34899个名称 · 性能评分</text>
       <view class="fake-search" @click="goSearch">
         <text class="search-icon">&#x1F50D;</text>
         <text class="search-placeholder">搜索钢材名称...</text>
