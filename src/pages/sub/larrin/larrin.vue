@@ -21,7 +21,7 @@
       <text
         v-for="(opt, i) in sortOpts"
         :key="'s'+i"
-        :class="['sort-tab', sortKey === opt.key ? 'active' : '']"
+        :class="['sort-tab', isDimActive(opt.key) ? 'active' : '']"
         @click="setSort(opt.key)"
       >{{ opt.label }}</text>
     </view>
@@ -40,7 +40,7 @@
         :key="item.name"
         @click="goDetail(idx)"
       >
-        <text class="row-name">{{ item.name }}</text>
+        <text class="row-name">{{ (idMap[item.name] && idMap[item.name].primaryName) || item.name }}</text>
         <view class="score-cell">
           <text class="score-val">{{ item.edgeRetention }}</text>
           <view class="score-bar"><view class="score-fill er" :style="{width: (item.edgeRetention*10)+'%'}"></view></view>
@@ -68,8 +68,11 @@ import { normName } from '@/utils/search.js'
 export default {
   data() {
     return {
-      sortKey: 'default',
+      // 当前选中的维度集合，例如 ['edgeRetention'] 或 ['edgeRetention','toughness']
+      // 空集合 = 默认排序
+      selectedDims: [],
       cat: 'all',
+      DIMS: ['edgeRetention', 'corrosion', 'toughness'],
       sortOpts: [
         { key: 'default', label: '默认' },
         { key: 'edgeRetention', label: '保持性' },
@@ -91,14 +94,26 @@ export default {
         { key: 'stainless', label: '不锈钢', count: counts.stainless }
       ]
     },
+    isAllThree() {
+      return this.selectedDims.length === 3
+    },
+    isDefault() {
+      return this.selectedDims.length === 0
+    },
     sortedList() {
       let list = larrinRatings.map(r => ({
         ...r,
         combined: (r.edgeRetention || 0) + (r.corrosion || 0) + (r.toughness || 0)
       }))
       if (this.cat !== 'all') list = list.filter(r => r.category === this.cat)
-      if (this.sortKey === 'default') return list
-      return list.slice().sort((a, b) => (b[this.sortKey] || 0) - (a[this.sortKey] || 0))
+      if (this.isDefault) return list
+      // 按选中维度之和排序
+      const dims = this.selectedDims
+      return list.slice().sort((a, b) => {
+        const sa = dims.reduce((s, d) => s + (a[d] || 0), 0)
+        const sb = dims.reduce((s, d) => s + (b[d] || 0), 0)
+        return sb - sa
+      })
     }
   },
   onShareAppMessage() {
@@ -108,15 +123,17 @@ export default {
     return {}
   },
   onLoad() {
-    // 预建 Larrin 名 → 钢材id 映射，方便点击跳转
+    // 预建 Larrin 名 → 钢材主名/id 映射，确保显示和跳转使用数据库主名
     const steels = getAllSteels()
-    const nameToId = new Map()
+    const nameToSteel = new Map()
     for (const s of steels) {
       for (const n of [s.name, ...(s.aliases || [])]) {
         const k = normName(n)
-        if (!nameToId.has(k)) nameToId.set(k, { id: s.id, isPrimary: normName(s.name) === k })
-        else if (!nameToId.get(k).isPrimary && normName(s.name) === k) {
-          nameToId.set(k, { id: s.id, isPrimary: true })
+        if (!nameToSteel.has(k)) nameToSteel.set(k, s)
+        else {
+          // 优先选主名匹配的
+          const ex = nameToSteel.get(k)
+          if (normName(ex.name) !== k && normName(s.name) === k) nameToSteel.set(k, s)
         }
       }
     }
@@ -124,14 +141,36 @@ export default {
     for (const r of larrinRatings) {
       const keys = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])].map(normName)
       for (const k of keys) {
-        if (nameToId.has(k)) { map[r.name] = { id: nameToId.get(k).id, displayName: r.name }; break }
+        if (nameToSteel.has(k)) {
+          const s = nameToSteel.get(k)
+          map[r.name] = { id: s.id, primaryName: s.name }
+          break
+        }
       }
     }
     this.idMap = map
   },
   methods: {
     setSort(key) {
-      this.sortKey = key
+      if (key === 'default') {
+        this.selectedDims = []
+        return
+      }
+      if (key === 'combined') {
+        // 综合按钮: 切换"全选三维"和"清空"
+        this.selectedDims = this.isAllThree ? [] : this.DIMS.slice()
+        return
+      }
+      // 三个维度: 切换该维度的选中状态
+      const idx = this.selectedDims.indexOf(key)
+      if (idx >= 0) this.selectedDims = this.selectedDims.filter(d => d !== key)
+      else this.selectedDims = [...this.selectedDims, key]
+    },
+    // 判断按钮是否高亮
+    isDimActive(key) {
+      if (key === 'default') return this.isDefault
+      if (key === 'combined') return this.isAllThree
+      return this.selectedDims.includes(key)
     },
     setCat(key) {
       this.cat = key
@@ -139,7 +178,7 @@ export default {
     showSortHelp() {
       uni.showModal({
         title: '排序规则说明',
-        content: '默认: Larrin 文章原始顺序\n保持性 / 防锈 / 韧性: 按单项分数从高到低\n综合: 三项分数相加(0~30 分)从高到低，是简单求和，未做加权\n\n注: 综合分仅供参考，实际选钢应结合用途权衡（切硬物看保持性，户外看防锈，斧/砍刀看韧性）。',
+        content: '默认: Larrin 文章原始顺序\n\n三个维度（保持性/防锈/韧性）可多选:\n· 选 1 项: 按单项分数从高到低\n· 选 2 项: 按两项之和排序\n· 选 3 项: "综合"自动亮起（= 三项之和，简单求和未加权）\n\n点"综合"等同于全选三维度，再点一下清空。\n\n注: 综合分仅供参考，实际选钢应结合用途权衡（切硬物看保持性，户外看防锈，斧/砍刀看韧性）。',
         showCancel: false,
         confirmText: '知道了'
       })
@@ -152,7 +191,7 @@ export default {
         return
       }
       uni.navigateTo({
-        url: '/pages/sub/detail/detail?id=' + target.id + '&name=' + encodeURIComponent(target.displayName)
+        url: '/pages/sub/detail/detail?id=' + target.id + '&name=' + encodeURIComponent(target.primaryName)
       })
     }
   }
