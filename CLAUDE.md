@@ -3,7 +3,7 @@
 刀具钢材化学成分数据库微信小程序「钢材狂魔」（由「细节狂魔」创建）。已上线。
 
 GitHub: https://github.com/dashjim/steel-chart
-当前版本: v1.2.0
+当前版本: v1.3.0 (待发布,新增 487 个别名独立成分)
 AppID: wx5a77a7218df15b30
 
 ## 技术栈
@@ -14,6 +14,7 @@ AppID: wx5a77a7218df15b30
 - **数据**: JSON 通过 import 打包进 JS（不使用 wx.getFileSystemManager）
 - **上传工具**: miniprogram-ci
 - **翻译**: Claude Haiku 4.5 via AWS Bedrock (us-west-2)
+- **OCR**: Claude Haiku 4.5 (主) / Opus 4.8 (复查) via Bedrock Vision,从 zknives 截图提取别名成分
 - **评分模型**: 线性回归，基于 Larrin Thomas 实测数据训练
 
 ## 项目结构
@@ -81,6 +82,7 @@ node scripts/build-rating-model.mjs  # 重建评分模型
 - 有工艺: 216（PM/CPM/ESR/MM/SF/VIM）
 - Larrin 实测评分: 61 种钢材
 - CATRA 切割数据: 60 种钢材
+- **别名独立成分: 487 个**（OCR 自 zknives 截图,双跑+合理性校验+Opus 复查,人审 5 条）
 - 构建产物: 主包 1.3MB + 子包 152KB = 1.4MB（gzip 传输 ~420KB）
 
 ## 关键设计决策
@@ -138,6 +140,14 @@ JSON 通过 `import` 编译进 JS bundle。**不能用** `wx.getFileSystemManage
 - 顺序: Larrin 粉末钢(isPM) → 其余 Larrin 钢材 → 全部其余钢材（共 1451 种全展示）
 - Larrin 名称匹配用**精确归一化**（去空格/连字符/点后比对），**禁用 includes**（短别名"60"会被"5160"误匹配）
 - Larrin 斜杠组合名（M390/20CV/204P）拆分后逐个查；同名多钢材优先主名匹配的
+
+### 别名独立成分（v1.3.0 新增）
+zknives 对部分别名公开**独立成分表格**（与主钢材的"系列成分"不同）。我们通过 Bedrock Vision OCR 把这些表格提取为结构化 JSON,作为详情页用别名进入时的展示数据。
+
+- **数据源**: `src/data/alias-composition-verified.json`（487 条）+ `alias-composition-needs-human.json`（5 条待人审）
+- **OCR 流程**: 截图 → 裁剪右上角 → Haiku 4.5 双跑 → 一致性比对 + 元素合理性校验 → 失败的进 flagged → fix-flagged-aliases 三阶段救援（N→W 批量改名 / Opus 第三跑） → 最终 verified
+- **N→W 复查**: Haiku 有系统性的 W↔N 字母混淆。LIMITS.N=0.5 收紧后,所有 N>0.1% 的样本都用 Opus 4.8 + 主名 hint 复查（recheck-n-aliases.mjs）
+- **详情页用法**: 别名访问时优先用别名的 country/maker/desc/composition,无则降级到主钢材
 
 ## 评分系统（进行中）
 
@@ -210,6 +220,17 @@ node scripts/translate-descriptions.mjs
 
 # 4. 构建评分模型 v2（需 larrin-ratings.json）
 node scripts/build-rating-model-v2.mjs
+
+# 5. 抓取别名 country/maker/desc 元数据
+node scripts/fetch-alias-metadata.mjs
+
+# 6. 翻译别名描述（Bedrock,批量）
+node scripts/translate-aliases.mjs
+
+# 7. 别名独立成分流水线（需 /tmp/zknives-crops/ 已有 486 张裁剪图）
+node scripts/extract-alias-composition-full.mjs  # 双跑 OCR → verified + flagged
+node scripts/fix-flagged-aliases.mjs              # 三阶段救援 flagged
+node scripts/recheck-n-aliases.mjs                # N>0.1% 复查 W↔N 误识
 ```
 
 ## 已踩过的坑
@@ -232,6 +253,9 @@ node scripts/build-rating-model-v2.mjs
 16. **movable-view 做图片缩放松手缩回** — 别自己做，直接用系统原生 previewImage
 17. **名称匹配禁用 includes** — 短别名"60"会被"5160"/"s60v"误包含，必须精确归一化匹配
 18. **真机横向溢出露白条** — 模拟器测不出；page/容器加 `overflow-x:hidden` + `width:100%`
+19. **zknives 没公开 API** — 成分以 base64 PNG 像素形式嵌入 HTML（不是 JSON 也不是 SVG），必须 OCR 提取
+20. **Haiku 4.5 OCR 有 W↔N 字母混淆** — N 在不锈钢里很少超过 1%（特例: LC200N/Vanax/Cronidur/MagnaCut/N77/Nitrox/S30V/S45VN/BD1N）。**任何 N>0.1% 的样本都要复查**,LIMITS.N=2 太松,改 0.5。复查时给 Opus 喂主名 hint 提高判断力
+21. **Bedrock Opus 4.8 已 deprecate temperature 参数** — 传入会 ValidationException,只能传 max_tokens
 
 ## 设计文档
 

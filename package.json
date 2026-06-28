@@ -36,6 +36,7 @@
     "build:quickapp-webview-union": "uni build -p quickapp-webview-union"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1075.0",
     "@dcloudio/uni-app": "3.0.0-5000720260410001",
     "@dcloudio/uni-app-harmony": "3.0.0-5000720260410001",
     "@dcloudio/uni-app-plus": "3.0.0-5000720260410001",

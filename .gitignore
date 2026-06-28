@@ -7,3 +7,7 @@ src/data/alias-metadata-progress.json
 src/data/alias-desc-zh-progress.json
 src/data/alias-metadata-failures.json
 src/data/aliases-to-translate.json
+src/data/alias-composition-flagged.json
+src/data/alias-composition-progress.json
+src/data/alias-composition-sample.json
+scripts/review.html
