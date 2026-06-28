@@ -137,9 +137,21 @@ export default {
         }
       }
     }
+
+    // Larrin 简称 → 数据库标准名的手动映射（数据库主名带 CPM 前缀但 Larrin 用裸名）
+    const LARRIN_ALIASES = {
+      '10V': 'CPM 10V',
+      '15V': 'CPM 15V',
+      'Super Gold 2': 'SG2'  // SG2 在数据库中，"Super Gold 2" 不是
+    }
+
     const map = {}
     for (const r of larrinRatings) {
-      const keys = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])].map(normName)
+      // 先尝试手动映射
+      const manual = LARRIN_ALIASES[r.name]
+      const candidates = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])]
+      if (manual) candidates.unshift(manual)
+      const keys = candidates.map(normName)
       for (const k of keys) {
         if (nameToSteel.has(k)) {
           const s = nameToSteel.get(k)
