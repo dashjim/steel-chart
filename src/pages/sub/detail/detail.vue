@@ -111,6 +111,7 @@ import { getRatings } from '@/utils/ratings.js'
 import { toggleFavorite, isFavorite } from '@/utils/favorites.js'
 import aliasMetadata from '@/data/alias-metadata.json'
 import aliasDescZh from '@/data/alias-desc-zh.json'
+import aliasComposition from '@/data/alias-composition-verified.json'
 
 const EL_NAMES = {
   C: '碳', Cr: '铬', Mo: '钼', V: '钒', W: '钨',
@@ -159,9 +160,12 @@ export default {
       const aliasZh = isAlias ? aliasDescZh[this.steelName] : null
       const descToShow = aliasZh || (steel.desc || '')
       this.descParts = this.parseDescription(descToShow)
-      if (steel.composition) {
+      // 别名访问时, 优先用别名的独立成分(zknives 真实数据)
+      const aliasComp = isAlias ? aliasComposition[this.steelName] : null
+      const compToShow = aliasComp || steel.composition
+      if (compToShow) {
         // 排序: C 永远第一, 其他按最大含量降序
-        const entries = Object.entries(steel.composition).map(([el, vals]) => ({
+        const entries = Object.entries(compToShow).map(([el, vals]) => ({
           el,
           zhName: EL_NAMES[el] || el,
           value: vals.length === 2 ? `${vals[0]}-${vals[1]}%` : `${vals[0]}%`,
