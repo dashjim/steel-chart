@@ -63,7 +63,6 @@
 <script>
 import larrinRatings from '@/data/larrin-ratings.json'
 import { getAllSteels } from '@/utils/data.js'
-import { normName } from '@/utils/search.js'
 
 export default {
   data() {
@@ -123,41 +122,15 @@ export default {
     return {}
   },
   onLoad() {
-    // 预建 Larrin 名 → 钢材主名/id 映射，确保显示和跳转使用数据库主名
+    // larrin-ratings.json 的 name 已对齐数据库主名，直接精确匹配即可
     const steels = getAllSteels()
-    const nameToSteel = new Map()
-    for (const s of steels) {
-      for (const n of [s.name, ...(s.aliases || [])]) {
-        const k = normName(n)
-        if (!nameToSteel.has(k)) nameToSteel.set(k, s)
-        else {
-          // 优先选主名匹配的
-          const ex = nameToSteel.get(k)
-          if (normName(ex.name) !== k && normName(s.name) === k) nameToSteel.set(k, s)
-        }
-      }
-    }
-
-    // Larrin 简称 → 数据库标准名的手动映射（数据库主名带 CPM 前缀但 Larrin 用裸名）
-    const LARRIN_ALIASES = {
-      '10V': 'CPM 10V',
-      '15V': 'CPM 15V',
-      'Super Gold 2': 'SG2'  // SG2 在数据库中，"Super Gold 2" 不是
-    }
+    const primaryToId = {}
+    for (const s of steels) primaryToId[s.name] = s.id
 
     const map = {}
     for (const r of larrinRatings) {
-      // 先尝试手动映射
-      const manual = LARRIN_ALIASES[r.name]
-      const candidates = [r.name, ...(r.name.includes('/') ? r.name.split('/') : [])]
-      if (manual) candidates.unshift(manual)
-      const keys = candidates.map(normName)
-      for (const k of keys) {
-        if (nameToSteel.has(k)) {
-          const s = nameToSteel.get(k)
-          map[r.name] = { id: s.id, primaryName: s.name }
-          break
-        }
+      if (primaryToId[r.name] != null) {
+        map[r.name] = { id: primaryToId[r.name], primaryName: r.name }
       }
     }
     this.idMap = map
